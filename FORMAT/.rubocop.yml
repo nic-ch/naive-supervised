@@ -1,0 +1,31 @@
+AllCops:
+  EnabledByDefault: true
+  NewCops: enable
+
+Layout/LineLength:
+  Max: 120
+
+Lint/RescueException:
+  Enabled: false
+Lint/UselessAccessModifier:
+  Enabled: false
+
+Metrics:
+  Enabled: false
+
+Naming:
+  Enabled: false
+
+Style/ClassVars:
+  Enabled: false
+Style/Copyright:
+  AutocorrectNotice: 'Copyright 2022 Nicolas Chaussé'
+  Enabled: false
+Style/GlobalVars:
+  Enabled: false
+Style/MissingElse:
+  Enabled: false
+Style/Next:
+  Enabled: false
+Style/StringConcatenation:
+  Enabled: false
