@@ -1,0 +1,54 @@
+# Ignore data directories.
+STOCK*/
+
+# Ignore generated documentation directories.
+Doxygen*/
+RDoc*/
+
+# Ignore temporary directories.
+tmp*/
+Tmp*/
+TMP*/
+
+
+# Ignore temporary files.
+tmp*
+Tmp*
+TMP*
+
+# Ignore other leftover and temporary files.
+*~*
+*.swp
+
+# Ignore compiled binary files.
+*GNU*
+*LLVM*
+
+
+# Copied from 'C++.gitignore' in github.com/github/gitignore.
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
