@@ -2,7 +2,7 @@
 
 # Naïve Supervised Learning Network - Getting Started
 
-The [main README](../README.md) sits in the parent directory.
+See the [main README](README.md).
 
 *All trademarks are the property of their respective owners.*
 
