@@ -34,11 +34,11 @@ This project has three main goals that happen to be mutually compatible:
 1. To implement the actual training in **C++17** so to get to master the language's many features, characteristics and quirks.
 1. To make the training as fast and optimized as possible.
 
-The first step to achieve this is to select simple, straightforward and consistent ***training data*** that feature unambiguous ***outputs*** (desired outcomes). Weekly stock data from the [Nasdaq Stock Market](nasdaq.com) shall thus be used as the initial training data for this project. Except if there is a holiday, these stocks are traded minimally every week, Monday to Friday, 9:30 to 16:00. 
+The first step to achieve this is to select simple, straightforward and consistent ***training data*** that feature unambiguous ***outputs*** (desired outcomes). Weekly stock data from the [Nasdaq Stock Market](https://www.nasdaq.com/) shall thus be used as the initial training data for this project. Except if there is a holiday, these stocks are traded minimally every week, Monday to Friday, 9:30 to 16:00. 
 
-***Data normalization*** will be done in [Ruby](ruby-lang.org) as development time and flexibility are vastly more important than normalization running time.
+***Data normalization*** will be done in [Ruby](https://www.ruby-lang.org) as development time and flexibility are vastly more important than normalization running time.
 
-[GNU g++](gcc.gnu.org) and [LLVM clang++](clang.llvm.org) will be used to analyze, compile and optimize C++17.
+[GNU g++](https://gcc.gnu.org/) and [LLVM clang++](https://clang.llvm.org/) will be used to analyze, compile and optimize C++17.
 
 ### General Approach
 
@@ -53,13 +53,13 @@ The approach to eat that elephant, perhaps naïvely, will be to:
 
 ## Obtain Stocks Training Data
 
-Thankfully, Nasdaq stocks data can be obtained from [Alpha Vantage](alphavantage.co). According to their Web site: "*Alpha Vantage provides enterprise-grade financial market data through a set of powerful and developer-friendly APIs.*" After obtaining an [API key](alphavantage.co/support) from them, script ***FORMAT/downloadStocks.rb*** can be invoked with said key as first argument and a redirected (`<`) list of desired stocks, e.g.:
+Thankfully, Nasdaq stocks data can be obtained from [Alpha Vantage](https://www.alphavantage.co). According to their Web site: "*Alpha Vantage provides enterprise-grade financial market data through a set of powerful and developer-friendly APIs.*" After obtaining an [API key](https://www.alphavantage.co/support) from them, script ***FORMAT/downloadStocks.rb*** can be invoked with said key as first argument and a redirected (`<`) list of desired stocks, e.g.:
 
 ```
 $ FORMAT/downloadStocks.rb KEYKEYKEY < stock_list.csv
 ``` 
 
-Where ***stock_list.csv*** could list for example the [Nasdaq-100](nasdaq.com/market-activity/quotes/nasdaq-ndx-index)'s stocks, and shall look like:
+Where ***stock_list.csv*** could list for example the [Nasdaq-100](https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index)'s stocks, and shall look like:
 
 ```
 Symbol, Name,
@@ -68,7 +68,7 @@ B, B Inc.,
 C, C Ltd.,
 ```
 
-This is quite a simple script that downloads one .csv file per stock provided (e.g. A.csv, B.csv, C.csv) according to hard-coded parameters. See the [Alpha Vantage API Documentation](alphavantage.co/documentation) to customize it. Obviously, any other way of obtaining stocks training data formatted as below or any other kind of training data can be used.
+This is quite a simple script that downloads one .csv file per stock provided (e.g. A.csv, B.csv, C.csv) according to hard-coded parameters. See the [Alpha Vantage API Documentation](https://www.alphavantage.co/documentation/) to customize it. Obviously, any other way of obtaining stocks training data formatted as below or any other kind of training data can be used.
 
 ### Training Data Format
 
