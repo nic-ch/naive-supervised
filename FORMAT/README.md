@@ -26,7 +26,7 @@ Copyright 2022 Nicolas Chaussé (nicolaschausse@protonmail.com)
 
 ## Introduction
 
-As illustrated in [GETTING_STARTED](GETTING_STARTED.md), Ruby script ***FORMAT/parseStocks.rb*** is used to parse, normalize and format each downloaded weekly stocks training data, as well as list the stocks with the highest gains. The following sections explain its main points.
+As illustrated in [Getting Started](GETTING_STARTED.md), Ruby script ***FORMAT/parseStocks.rb*** is used to parse, normalize and format each downloaded weekly stocks training data, as well as list the stocks with the highest gains. The following sections explain its main points.
 
 ---
 

@@ -2,7 +2,7 @@
 
 # Naïve Supervised Learning Network - Theory
 
-A step-by-step tutorial is available in [GETTING_STARTED](GETTING_STARTED.md).
+A step-by-step tutorial is available in [Getting Started](GETTING_STARTED.md).
 
 ---
 
