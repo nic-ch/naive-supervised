@@ -38,7 +38,7 @@ The first step to achieve this is to select simple, straightforward and consiste
 
 ***Data normalization*** will be done in [Ruby](https://www.ruby-lang.org) as development time and flexibility are vastly more important than normalization running time.
 
-[GNU g++](https://gcc.gnu.org/) and [LLVM clang++](https://clang.llvm.org/) will be used to analyze, compile and optimize C++17.
+[GNU g++](https://gcc.gnu.org) and [LLVM clang++](https://clang.llvm.org) will be used to analyze, compile and optimize C++17.
 
 ### General Approach
 
