@@ -676,7 +676,7 @@ class StocksParser
   def outputTrainDataToBinaryFile
     # Output to STOCKS_EVENT_<@fileNameInfix>.bin.
     outputFileName = 'EVENT' + (@fileNameInfix ? ('_' + @fileNameInfix) : '') + '.bin'
-    print("\n∙ OUTPUTTING TRAIN DATA TO BINARY FILE '", outputFileName, "'... ")
+    print("\n∙ OUTPUTTING 16 bit unsigned TRAIN DATA TO BINARY FILE '", outputFileName, "'... ")
 
     ensureThereAreStocks
 
