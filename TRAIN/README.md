@@ -42,7 +42,7 @@ And as follows to predict:
 $ predict WEEK_4_THURSDAY_NIGHT/EVENT_<date>.bin weights.bin
 ```
 
-To build, compile, analyze and run any of the programs following, please see [C++ README_CPP](README_CPP.md) in directory *TRAIN*.
+To build, compile, analyze and run any of the programs following, please see the [C++ README](README_CPP.md) in directory *TRAIN*.
 
 ---
 
@@ -69,7 +69,7 @@ A number of utility classes and static functions have been defined in include fi
 
 ## Testing
 
-* ***testUtilities.cpp*** tests all utility procedures and classes and uses C++ testing framework [doctest](https://github.com/doctest/doctest). To run it:
+* ***testUtilities.cpp*** tests all utility procedures and classes, and uses C++ testing framework [doctest](https://github.com/doctest/doctest). To run it:
 
 ```
 $ ./run.sh testUtilities.cpp
@@ -81,7 +81,7 @@ $ ./run.sh testUtilities.cpp
 $ ./run.sh testCollectionsSpeeds.cpp
 ```
 
-* ***testRandomsSpeeds.cpp*** tests three kings of random integer as well as ensures validates that RandomBoolean is indeed substantially faster than just the random integer. To run it:
+* ***testRandomsSpeeds.cpp*** tests three kings of random integer as well as validates that RandomBoolean is indeed substantially faster than just the random integer. To run it:
 
 ```
 $ ./run.sh testRandomsSpeeds.cpp
