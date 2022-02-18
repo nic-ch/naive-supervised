@@ -46,7 +46,7 @@ Awesome static analyzer [RuboCop](https://rubocop.org/) is used continually in t
 
 Its usage is as follows:
 
-```console
+```
 $ ./parseStocks.rb 
 USAGE:
 	FORMAT/parseStocks.rb  TEST    ‡ ALL other arguments will be IGNORED.
@@ -81,7 +81,7 @@ timestamp,open,high,low,close,volume
 
 It then gathers lines only if within the provided *train timestamps* or *gain timestamps*. Finally, every unique *timestamp* showing multiple lines will get its amounts averaged. Oddly, consecutive downloads of stock training data of the exact same time period will occasionally show slightly different values. In that case, the script can be called as follows:
 
-```console
+```
 $ parseStocks ... DOWNLOAD_1/A.csv DOWNLOAD_2/A.csv DOWNLOAD_3/A.csv
 ```
 
@@ -182,7 +182,7 @@ The script' test suite partially meta-programs Ruby itself so to self-encapsulat
 
 Testing the whole script is simply done as follows:
 
-```console
+```
 $ parseStocks.rb TEST
 ```
 

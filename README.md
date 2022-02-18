@@ -55,7 +55,7 @@ The approach to eat that elephant, perhaps naïvely, will be to:
 
 Thankfully, Nasdaq stocks data can be obtained from [Alpha Vantage](https://www.alphavantage.co). According to their Web site: "*Alpha Vantage provides enterprise-grade financial market data through a set of powerful and developer-friendly APIs.*" After obtaining an [API key](https://www.alphavantage.co/support) from them, script ***FORMAT/downloadStocks.rb*** can be invoked with said key as first argument and a redirected (`<`) list of desired stocks, e.g.:
 
-```console
+```
 $ FORMAT/downloadStocks.rb KEYKEYKEY < stock_list.csv
 ```
 

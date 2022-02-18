@@ -52,18 +52,18 @@ A number of utility classes and static functions have been defined in include fi
 
 ### Utility Procedures
 
-* ***OpenInputBinaryFileNamed(fileName)*** opens a file in binary mode and returns a tuple containing the corresponding *std::ifstream* object, an error message on error and the file size.
-* ***String(value ...)*** returns a *std::string* made of any number of values whose types are recognized by *std::ostringstream*.
-* ***TypeNameOf(object)*** returns *object*'s class name in a *std::string*.
+* ***OpenInputBinaryFileNamed(fileName)*** opens a file in binary mode and returns a tuple containing the corresponding `std::ifstream` object, an error message on error and the file size.
+* ***String(value ...)*** returns a `std::string` made of any number of values whose types are recognized by `std::ostringstream`.
+* ***TypeNameOf(object)*** returns *object*'s class name in a `std::string`.
 
 ### Utility Classes
 
-* ***Array*** is composed of a *std::vector* but which size can only be set once. Used to avoid checking sizes and overflows all the time.
+* ***Array*** is composed of a `std::vector` but which size can only be set once. Used to avoid checking sizes and overflows all the time.
 * ***GoferThreadsPool*** is instantiated with a fixed number of threads (e.g. number of actual cores) that execute enqueued errands in order. Used to limit CPU usage if flooded with errands, and to control the proliferation of threads that may hurt CPU caching.
 * ***Logger*** logs simultaneously to stdout and to a file.
 * ***NoConstructAllocator*** is used to instantiate huge collections that absolutely do not need all their values to be zeroed. Used to save time and CPU cycles.
 * ***RandomBoolean*** uses every bit of an expensive random integer to provide random booleans.
-* ***Timer*** times to the microsecond and prints on any *std::basic_ostream*.
+* ***Timer*** times to the microsecond and prints on any `std::basic_ostream`.
 
 ---
 
@@ -75,7 +75,7 @@ A number of utility classes and static functions have been defined in include fi
 $ ./run.sh testUtilities.cpp
 ```
 
-* ***testCollectionsSpeeds.cpp*** tests various collections of various sizes and of types: C array, std::vector, Array; as well as inside smart pointers. This is to validate that compilers will optimize away and that everything performs the same. To run it:
+* ***testCollectionsSpeeds.cpp*** tests various collections of various sizes and of types: `C-array`, `std::vector`, `Array`; as well as inside smart pointers. This is to validate that compilers will optimize away and that everything performs the same. To run it:
 
 ```
 $ ./run.sh testCollectionsSpeeds.cpp
