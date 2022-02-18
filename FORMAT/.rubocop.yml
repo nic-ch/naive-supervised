@@ -16,8 +16,6 @@ Metrics:
 Naming:
   Enabled: false
 
-Style/ClassVars:
-  Enabled: false
 Style/Copyright:
   AutocorrectNotice: 'Copyright 2022 Nicolas Chaussé'
   Enabled: false
