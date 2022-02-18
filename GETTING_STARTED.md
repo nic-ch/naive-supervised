@@ -62,7 +62,7 @@ We want at this point to produce ***training inputs*** on the trading that happe
 $ cd WEEK_1
 $ ../FORMAT/parseStocks.rb '2022-01-10' '09:31' \
                            '2022-01-13' '16:00' \
-                           '2022-01-14 09:31' '2022-01-14 16:00'
+                           '2022-01-14 09:31' '2022-01-14 16:00' \
                            *.csv
 ```
 
@@ -100,8 +100,8 @@ We now want to develop a Supervised Learning, train and predict program (documen
 Assuming that when we parsed Week 1, stock A performed the best, and similarly stock B for Week 2 and stock C for Week 3:
 
 ```console
-$ train WEEK_1/EVENT_<date>.bin A
-        WEEK_2/EVENT_<date>.bin B
+$ train WEEK_1/EVENT_<date>.bin A \
+        WEEK_2/EVENT_<date>.bin B \
         WEEK_3/EVENT_<date>.bin C
 ```
 
@@ -115,7 +115,7 @@ $ cd WEEK_4_THURSDAY_NIGHT
 $ ../FORMAT/downloadStocks.rb KEY < stock_list.csv
 $ ../FORMAT/parseStocks.rb '2022-01-10' '09:31' \
                            '2022-01-13' '16:00' \
-                           '2022-01-13 09:31' '2022-01-13 16:00'
+                           '2022-01-13 09:31' '2022-01-13 16:00' \
                            *.csv
 ```
 
