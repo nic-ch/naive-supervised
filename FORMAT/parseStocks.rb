@@ -85,26 +85,41 @@ end
 class StocksParser
   public
 
-  ###############
-  # DEFINITIONS #
-  ###############
-
-  # Including the terminating null.
-  @@StockNameMaximumLength = 16
-  @@InputFilesHeader = 'timestamp,open,high,low,close,volume'
-  # timestamp will be stripped.
-  @@ColumnsCount = 5
-  # Prices are expressed in dollars as 123.4567 in the csv files. Shoud NOT be 0.
-  @@PriceMultiplier = 10_000
-
-  ###########################
-  # PUBLIC INSTANCE METHODS #
-  ###########################
+  ##############
+  # INITIALIZE #
+  ##############
 
   # All files outputted will get #fileNameInfix in their file name.
   def initialize(fileNameInfix)
     @fileNameInfix = fileNameInfix
   end
+
+  ###############
+  # DEFINITIONS #
+  ###############
+
+  # Including the terminating null.
+  def stockNameMaximumLength
+    16
+  end
+
+  def inputFilesHeader
+    'timestamp,open,high,low,close,volume'
+  end
+
+  # timestamp will be stripped.
+  def columnsCount
+    5
+  end
+
+  # Prices are expressed in dollars as 123.4567 in the csv files. Shoud NOT be 0.
+  def priceMultiplier
+    10_000
+  end
+
+  ###########################
+  # PUBLIC INSTANCE METHODS #
+  ###########################
 
   # Start the script, either in test mode or in normal mode.
   def start
@@ -252,7 +267,7 @@ class StocksParser
         exception(error, "Can not read file.\n")
       else
         # If first line matches the header.
-        if (header = inputLines.shift).eql?(@@InputFilesHeader)
+        if (header = inputLines.shift).eql?(inputFilesHeader)
           timestamp_amounts = @stockName_timestamp_amounts[stockName]
           trainTimestampsCount = 0
           gainTimestampsCount = 0
@@ -269,10 +284,10 @@ class StocksParser
               if isTimestampTrain || isTimestampGain
                 # amounts is now [open, high, low, close, volume].
                 # Convert decimals to rationals, then to integers after being multiplied.
-                amounts[0] = Integer(Rational(amounts[0]) * @@PriceMultiplier)
-                amounts[1] = Integer(Rational(amounts[1]) * @@PriceMultiplier)
-                amounts[2] = Integer(Rational(amounts[2]) * @@PriceMultiplier)
-                amounts[3] = Integer(Rational(amounts[3]) * @@PriceMultiplier)
+                amounts[0] = Integer(Rational(amounts[0]) * priceMultiplier)
+                amounts[1] = Integer(Rational(amounts[1]) * priceMultiplier)
+                amounts[2] = Integer(Rational(amounts[2]) * priceMultiplier)
+                amounts[3] = Integer(Rational(amounts[3]) * priceMultiplier)
                 amounts[4] = Integer(amounts[4])
 
                 # Add a row to amounts which is a matrix for now.
@@ -293,7 +308,7 @@ class StocksParser
             @stockName_timestamp_amounts.delete(stockName)
           end
         else
-          error("File ignored as first line '", header, "' does not match header '", @@InputFilesHeader, "'.\n")
+          error("File ignored as first line '", header, "' does not match header '", inputFilesHeader, "'.\n")
         end
       end
     end
@@ -339,11 +354,11 @@ class StocksParser
     @sortedStockNames = @stockName_timestamp_amounts.keys.sort
     print('◦ Gathered ', @sortedStockNames.size, " stock names.\n")
     # Validate stock name lengths.
-    lengthyStockNames = @sortedStockNames.select { |stockName| stockName.length >= @@StockNameMaximumLength }
+    lengthyStockNames = @sortedStockNames.select { |stockName| stockName.length >= stockNameMaximumLength }
     unless lengthyStockNames.empty?
       abort(
         'The following stock name(s) contain ',
-        @@StockNameMaximumLength,
+        stockNameMaximumLength,
         " characters or more: '",
         lengthyStockNames.join("', '"),
         "'.\n"
@@ -572,7 +587,7 @@ class StocksParser
         @sortedStockNames.each do |stockName|
           timestamp_amounts = @stockName_timestamp_amounts[stockName]
           # Output '# stockName'.
-          outputFile.print('# ', stockName, "\n# ", @@InputFilesHeader, "\n")
+          outputFile.print('# ', stockName, "\n# ", inputFilesHeader, "\n")
           # Output for all train timestamps.
           @sortedTrainTimestamps.each do |trainTimestamp|
             # amounts is [open, high, low, close, volume].
@@ -687,8 +702,8 @@ class StocksParser
           [
             @sortedStockNames.size,
             @sortedTrainTimestamps.size,
-            @@ColumnsCount,
-            @@StockNameMaximumLength
+            columnsCount,
+            stockNameMaximumLength
           ].pack('LLLL')
           # L for pack is 32-bit unsigned, native endian (uint32_t).
         )
@@ -698,7 +713,7 @@ class StocksParser
           timestamp_amounts = @stockName_timestamp_amounts[stockName]
 
           packedStockName = stockName.dup
-          ((packedStockName.size)..(@@StockNameMaximumLength - 1)).each { |index| packedStockName[index] = "\0" }
+          ((packedStockName.size)..(stockNameMaximumLength - 1)).each { |index| packedStockName[index] = "\0" }
           outputFile.print(packedStockName)
 
           # Output only for the train timestamps ordered by timestamp.
@@ -806,7 +821,7 @@ class StocksParser
   def testLinesIgnored
     fileName = 'B.csv'
     ::File.open(fileName, 'w') do |outputFile|
-      outputFile.print(@@InputFilesHeader + "\n")
+      outputFile.print(inputFilesHeader + "\n")
       outputFile.print("Hello\n")
     end
 
@@ -826,7 +841,7 @@ class StocksParser
     fileName = 'C.csv'
     # 'timestamp,open,high,low,close,volume'
     ::File.open(fileName, 'w') do |outputFile|
-      outputFile.print(@@InputFilesHeader + "\n")
+      outputFile.print(inputFilesHeader + "\n")
       outputFile.print("2022-01-11 13:01:00, 2.0000, 3.0000, 2.0000, 3.0000, 234\n")
       outputFile.print("2022-01-11 13:00:00, 1.0000, 2.0000, 1.0000, 2.0000, 123\n")
     end
@@ -849,12 +864,12 @@ class StocksParser
     fn2 = '1234567890123456.csv'
     # 'timestamp,open,high,low,close,volume'
     ::File.open(fn1, 'w') do |outputFile|
-      outputFile.print(@@InputFilesHeader + "\n")
+      outputFile.print(inputFilesHeader + "\n")
       outputFile.print("2022-01-11 13:01:00, 2.0000, 3.0000, 2.0000, 3.0000, 234\n")
       outputFile.print("2022-01-11 13:00:00, 1.0000, 2.0000, 1.0000, 2.0000, 123\n")
     end
     ::File.open(fn2, 'w') do |outputFile|
-      outputFile.print(@@InputFilesHeader + "\n")
+      outputFile.print(inputFilesHeader + "\n")
       outputFile.print("2022-01-11 13:01:00, 2.0000, 3.0000, 2.0000, 3.0000, 234\n")
       outputFile.print("2022-01-11 13:00:00, 1.0000, 2.0000, 1.0000, 2.0000, 123\n")
     end
@@ -879,11 +894,11 @@ class StocksParser
     fn1 = '12345678901234.csv'
     fn2 = '123456789012345.csv'
     ::File.open(fn1, 'w') do |outputFile|
-      outputFile.print(@@InputFilesHeader + "\n")
+      outputFile.print(inputFilesHeader + "\n")
       outputFile.print("2022-01-11 13:00:00, 1.0000, 2.0000, 1.0000, 2.0000, 123\n")
     end
     ::File.open(fn2, 'w') do |outputFile|
-      outputFile.print(@@InputFilesHeader + "\n")
+      outputFile.print(inputFilesHeader + "\n")
       outputFile.print("2022-01-11 13:01:00, 2.0000, 3.0000, 2.0000, 3.0000, 234\n")
       outputFile.print("2022-01-11 13:00:00, 1.0000, 2.0000, 1.0000, 2.0000, 123\n")
     end
@@ -908,19 +923,19 @@ class StocksParser
   def testGathered_Averaging_OutputToTextFile
     # 'timestamp,open,high,low,close,volume'
     d1 = [\
-      @@InputFilesHeader \
+      inputFilesHeader \
       , '2022-01-15 10:03:00,9.0009,1.0010,2.0011,3.0012,34' \
       , '2022-01-15 10:02:00,4.0013,5.0014,6.0015,7.0016,45' \
       , '2022-01-15 10:01:00,8.0017,9.0018,1.0019,2.0020,56'
     ]
     d2 = [\
-      @@InputFilesHeader \
+      inputFilesHeader \
       , '2022-01-15 10:03:00,1.0001,2.0011,3.0012,4.0013,4' \
       , '2022-01-15 10:02:00,5.0014,6.0015,7.0016,8.0017,5' \
       , '2022-01-15 10:01:00,9.0018,1.0019,2.0020,3.0021,6'
     ]
     e = [\
-      @@InputFilesHeader \
+      inputFilesHeader \
       , '2022-01-15 10:03:00,9.0000,1.0000,2.0000,3.0000,345' \
       , '2022-01-15 10:02:00,4.0000,5.0000,6.0000,7.0000,456' \
       , '2022-01-15 10:01:00,8.0000,9.0000,1.0000,2.0000,567'
@@ -928,12 +943,12 @@ class StocksParser
     # D's prices had their decimal dots removed, then averaged by hand, then the timestamps were sorted!
     manualStocks = [\
       '# D' \
-      , ('# ' + @@InputFilesHeader) \
+      , ('# ' + inputFilesHeader) \
       , '2022-01-15 10:01,85017,50018,15019,25020,31' \
       , '2022-01-15 10:02,45013,55014,65015,75016,25' \
       , '2022-01-15 10:03,50005,15010,25011,35012,19' \
       , '# E' \
-      , ('# ' + @@InputFilesHeader) \
+      , ('# ' + inputFilesHeader) \
       , '2022-01-15 10:01,80000,90000,10000,20000,567' \
       , '2022-01-15 10:02,40000,50000,60000,70000,456' \
       , '2022-01-15 10:03,90000,10000,20000,30000,345'
@@ -979,13 +994,13 @@ class StocksParser
   def testExtrapolateMissingTrainTimestamps
     # 'timestamp,open,high,low,close,volume'
     original = [\
-      @@InputFilesHeader \
+      inputFilesHeader \
       , '2022-01-01 09:32,2.0000,4.0000,1.0000,3.0000,11' \
       , '2022-01-01 09:33,7.0000,9.0000,6.0000,6.0000,30'
     ]
     manual = [\
       '# G' \
-      , ('# ' + @@InputFilesHeader) \
+      , ('# ' + inputFilesHeader) \
       , '2022-01-01 09:31,20000,40000,10000,30000,11' \
       , '2022-01-01 09:32,30000,50000,30000,50000,10' \
       , '2022-01-01 09:33,50000,70000,50000,70000,10' \
@@ -1014,13 +1029,13 @@ class StocksParser
   def testNormalizeTrainAmounts
     # 'timestamp,open,high,low,close,volume'
     a = [\
-      @@InputFilesHeader \
+      inputFilesHeader \
       , '2022-01-15 10:03:00,95.0000,100.0000,95.0000,100.0000,34' \
       , '2022-01-15 10:02:00,90.0000,95.0000,90.0000,95.0000,45' \
       , '2022-01-15 10:01:00,85.0000,90.0000,85.0000,90.0000,56'
     ]
     b = [\
-      @@InputFilesHeader \
+      inputFilesHeader \
       , '2022-01-15 10:03:00,0.0800,0.0800,0.0700,0.0700,10' \
       , '2022-01-15 10:02:00,0.0900,0.0900,0.0800,0.0800,9' \
       , '2022-01-15 10:01:00,0.1000,0.1000,0.0900,0.0900,8'
@@ -1038,12 +1053,12 @@ class StocksParser
     # (0.1 * 65534 / 0.3) + 1 = 21845.7, (0.0 * 65534 / 0.3) + 1 = 1.
     manual = [\
       '# A' \
-      , ('# ' + @@InputFilesHeader) \
+      , ('# ' + inputFilesHeader) \
       , '2022-01-15 10:01,32768,43690,32768,43690,65535' \
       , '2022-01-15 10:02,43690,54612,43690,54612,52662' \
       , '2022-01-15 10:03,54612,65535,54612,65535,39789' \
       , '# B' \
-      , ('# ' + @@InputFilesHeader) \
+      , ('# ' + inputFilesHeader) \
       , '2022-01-15 10:01,65535,65535,43690,43690,52428' \
       , '2022-01-15 10:02,43690,43690,21845,21845,58981' \
       , '2022-01-15 10:03,21845,21845,1,1,65535'
