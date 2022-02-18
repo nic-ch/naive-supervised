@@ -12,7 +12,7 @@ See the [main README](README.md).
 
 ### Clone the Repository
 
-```
+```console
 $ git clone https://github.com/nic-ch/naive-supervised.git
 $ cd naive-supervised
 ```
@@ -23,7 +23,7 @@ To use script ***FORMAT/downloadStocks.rb***, get your own KEY and create your o
 
 Download weekly stocks training data for any number of weeks:
 
-```
+```console
 $ mkdir WEEK_<i>
 $ cd WEEK_<i>
 $ ../FORMAT/downloadStocks.rb KEY < stock_list.csv
@@ -33,7 +33,7 @@ $ ../FORMAT/downloadStocks.rb KEY < stock_list.csv
 
 Parse, normalize and format each downloaded weekly stocks training data using script ***FORMAT/parseStocks.rb***. To see its usage, invoke it without arguments:
 
-```
+```console
 $ FORMAT/parseStocks.rb 
 USAGE:
 	FORMAT/parseStocks.rb  TEST    ‡ ALL other arguments will be IGNORED.
@@ -58,7 +58,7 @@ We want at this point to produce ***training inputs*** on the trading that happe
 
 ### Parse Week 1
 
-```
+```console
 $ cd WEEK_1
 $ ../FORMAT/parseStocks.rb '2022-01-10' '09:31' \
                            '2022-01-13' '16:00' \
@@ -99,7 +99,7 @@ We now want to develop a Supervised Learning, train and predict program (documen
 
 Assuming that when we parsed Week 1, stock A performed the best, and similarly stock B for Week 2 and stock C for Week 3:
 
-```
+```console
 $ train WEEK_1/EVENT_<date>.bin A
         WEEK_2/EVENT_<date>.bin B
         WEEK_3/EVENT_<date>.bin C
@@ -109,7 +109,7 @@ This shall produce a ***weights.bin*** file that can ideally predict future gain
 
 We shall then download again on **Thursday night** following Week 3 and parse with a phony gain period (Thursday instead of Friday) as Friday did not happen yet:
 
-```
+```console
 $ mkdir WEEK_4_THURSDAY_NIGHT
 $ cd WEEK_4_THURSDAY_NIGHT
 $ ../FORMAT/downloadStocks.rb KEY < stock_list.csv
@@ -123,7 +123,7 @@ $ ../FORMAT/parseStocks.rb '2022-01-10' '09:31' \
 
 Still on Thursday night, we shall then try to predict what stock will gain most on Friday:
 
-```
+```console
 $ predict WEEK_4_THURSDAY_NIGHT/EVENT_<date>.bin weights.bin
 ```
 
