@@ -67,8 +67,8 @@ CPPCHECK_FLAGS+=' --suppress=missingInclude --suppress=useStlAlgorithm'
 
 CLANG_TIDY_FLAGS='--quiet --use-color --header-filter=.*'
 # Checks.
-CLANG_TIDY_FLAGS+=' --checks=cert-*'
-CLANG_TIDY_FLAGS+=',abseil-*'
+CLANG_TIDY_FLAGS+=' --checks='
+CLANG_TIDY_FLAGS+='abseil-*'
 CLANG_TIDY_FLAGS+=',android-*'
 CLANG_TIDY_FLAGS+=',cert-*'
 CLANG_TIDY_FLAGS+=',clang-analyzer-*'
