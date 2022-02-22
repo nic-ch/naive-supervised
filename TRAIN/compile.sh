@@ -12,7 +12,7 @@ source flags.sh
 COMMANDS=''
 # Arguments: compiler, flags, executable.
 AddCommand() {
-  COMMANDS+="echo -e '\n\e[1m\e[97m\e[41m Compiling with $1 to '$3' \e[0m'; $1 $2 -o $3 && strip -s -x $3  @  "
+  COMMANDS+="echo -e \"\n\e[1m\e[97m\e[41m Compiling with $1 to '$3' \e[0m\"; $1 $2 -o $3 && strip -s -x $3  @  "
 }
 
 # GNU g++, space-separated list of clang-tidy versions to use.
