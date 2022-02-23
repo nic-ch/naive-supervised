@@ -151,12 +151,12 @@ public:
 
   decltype(auto) operator()(char const* const fileName)
   {
-    return openBinaryFileNamed(fileName);
+    return openBinaryFileNamed(static_cast<char const*>(fileName));
   }
 
   decltype(auto) operator()(char* const fileName)
   {
-    return openBinaryFileNamed(fileName);
+    return openBinaryFileNamed(static_cast<char const*>(fileName));
   }
 
   template<typename FileName>
