@@ -94,7 +94,8 @@ constexpr static unsigned int const CacheLineByteSize{ (ProvidedCacheLineByteSiz
     Returns std::tuple {std::ifstream file, std::string errorMessage, std::streamsize fileSize},
     where errorMessage is provided on failure an fileSize (in char_types) is valid on success.
 */
-static class {
+static class
+{
   // DEFINITIONS //
 public:
   using Status = std::tuple<std::ifstream, std::string, std::streamsize>;
@@ -143,7 +144,7 @@ private:
     getJustOpenedBinaryFileStatus(status);
 
     return status;
- }
+  }
 
   // PUBLIC INSTANCE METHODS //
 public:
@@ -154,18 +155,14 @@ public:
     return openBinaryFileNamed(static_cast<char const*>(fileName));
   }
 
-  decltype(auto) operator()(char* const fileName)
-  {
-    return openBinaryFileNamed(static_cast<char const*>(fileName));
-  }
+  decltype(auto) operator()(char* const fileName) { return openBinaryFileNamed(static_cast<char const*>(fileName)); }
 
   template<typename FileName>
   decltype(auto) operator()(FileName const& fileName)
   {
     return openBinaryFileNamed(fileName);
   }
-}
-OpenInputBinaryFileNamed;
+} OpenInputBinaryFileNamed;
 
 /** e.g. String(+"Hello ", 123.45, '.') returns std::string("Hello 123.45.").
     Prefix C-strings literals with a + sign, e.g. +"Hello World!", to decay them all to char const *
@@ -174,7 +171,7 @@ OpenInputBinaryFileNamed;
 template<typename... Values>
 static decltype(auto)
 // Not 'Values const &' as Timer's << is not const.
-String(Values&& ... values)
+String(Values&&... values)
 {
   if constexpr (sizeof...(values)) {
     std::ostringstream stringStream;
@@ -278,13 +275,8 @@ protected:
   template<typename Size, typename MethodName>
   void throwException_CouldNotBeSized(Size const receiverSize, Size const newSize, MethodName const& methodName) const
   {
-    throw std::runtime_error(String(+"Receiver's vector (of size ",
-                                    receiverSize,
-                                    +") could not be resized to ",
-                                    newSize,
-                                    +" in: ",
-                                    methodName,
-                                    '.'));
+    throw std::runtime_error(String(
+      +"Receiver's vector (of size ", receiverSize, +") could not be resized to ", newSize, +" in: ", methodName, '.'));
   }
 };
 
@@ -328,7 +320,8 @@ public:
   Array() = default;
   explicit Array(size_t const size)
     : myVector(size)
-  {}
+  {
+  }
 
   // Rule of Five.
   Array(Array const& otherArray) noexcept(noexcept(myVector = otherArray.myVector)) = default;
@@ -490,11 +483,11 @@ private:
   /* Only used by the destructor to signal the gofer threads to die, as it is assumed that if GoferThreadsPool
      itself is shared, then it will NOT be destroyed by a sharer while other sharers are still using it.
   */
-  bool myMustDie{ false };                                               // + 4(1) = 48 byte.
-  std::queue<ErrandProcedure> myErrandsQueue;                            // + 80 = 128 = 2×64 bytes.
-  mutable std::condition_variable_any myGoferThreadsConditionVariable;   // + 64 = 192 = 3×64 bytes.
-  mutable std::condition_variable_any myClientThreadsConditionVariable;  // + 64 = 256 = 4×64 bytes.
-  std::vector<std::thread> myGoferThreadsVector;                         // + 24 = 280 = 4.375×64 bytes.
+  bool myMustDie{ false };                                              // + 4(1) = 48 byte.
+  std::queue<ErrandProcedure> myErrandsQueue;                           // + 80 = 128 = 2×64 bytes.
+  mutable std::condition_variable_any myGoferThreadsConditionVariable;  // + 64 = 192 = 3×64 bytes.
+  mutable std::condition_variable_any myClientThreadsConditionVariable; // + 64 = 256 = 4×64 bytes.
+  std::vector<std::thread> myGoferThreadsVector;                        // + 24 = 280 = 4.375×64 bytes.
 
   // DESTRUCTOR //
 public:
@@ -1050,11 +1043,17 @@ public:
     myLapTicks = 0;
     myStartTicks = NOW_TICKS;
   }
-  void lap() noexcept(noexcept(NOW_TICKS)) { myLapTicks = NOW_TICKS; }
+  void lap() noexcept(noexcept(NOW_TICKS))
+  {
+    myLapTicks = NOW_TICKS;
+  }
 
   // CONSTRUCTOR //
 public:
-  Timer() noexcept(noexcept(restart())) { restart(); }
+  Timer() noexcept(noexcept(restart()))
+  {
+    restart();
+  }
 
   // PUBLIC INSTANCE METHODS //
 public:
@@ -1065,8 +1064,14 @@ public:
 
     return myLapTicks - myStartTicks;
   }
-  decltype(auto) elapsedSeconds() noexcept(noexcept(lap())) { return elapsedTicks() / TicksPerSecond; }
-  decltype(auto) elapsedMilliseconds() noexcept(noexcept(lap())) { return elapsedTicks() / (TicksPerSecond / 1000); }
+  decltype(auto) elapsedSeconds() noexcept(noexcept(lap()))
+  {
+    return elapsedTicks() / TicksPerSecond;
+  }
+  decltype(auto) elapsedMilliseconds() noexcept(noexcept(lap()))
+  {
+    return elapsedTicks() / (TicksPerSecond / 1000);
+  }
   decltype(auto) elapsedMicroseconds() noexcept(noexcept(lap()))
   {
     return elapsedTicks() / (TicksPerSecond / 1000'000);

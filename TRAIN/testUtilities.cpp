@@ -68,7 +68,10 @@ TEST_CASE("String()")
     CHECK_EQ(String(+""), "");
   }
 
-  SUBCASE("Non Empty") { CHECK_EQ(String(2.3, ' ', -6, +" Hello!\n"), std::string("2.3 -6 Hello!\n")); }
+  SUBCASE("Non Empty")
+  {
+    CHECK_EQ(String(2.3, ' ', -6, +" Hello!\n"), std::string("2.3 -6 Hello!\n"));
+  }
 }
 
 TEST_CASE("TypeNameOf()")
@@ -497,8 +500,8 @@ TEST_CASE("Array")
 
   SUBCASE("operator=()")
   {
-    Array<decltype(Rand()), NoConstructAllocator<decltype(Rand())>>
-      a(static_cast<size_t>(100'000 + (Rand() % 100'000)));
+    Array<decltype(Rand()), NoConstructAllocator<decltype(Rand())>> a(
+      static_cast<size_t>(100'000 + (Rand() % 100'000)));
     for (auto&& e : a)
       e = Rand();
 
@@ -829,8 +832,7 @@ TEST_CASE("GoferThreadsPool" * doctest::timeout(5))
     CHECK_EQ(errands.size(), VectorSizes);
 
     // Test three different pool sizes.
-    auto const TestGoferThreadsPool{ [&](decltype(VectorSizes) const threadsCount)
-    {
+    auto const TestGoferThreadsPool{ [&](decltype(VectorSizes) const threadsCount) {
       {
         GoferThreadsPool p(threadsCount);
         if (threadsCount > 0)

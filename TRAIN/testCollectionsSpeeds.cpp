@@ -55,7 +55,8 @@ private:
 public:
   explicit Container(size_t size)
     : myValues(size)
-  {}
+  {
+  }
   auto& values() { return myValues; }
   auto const& constValues() const { return myValues; }
 
