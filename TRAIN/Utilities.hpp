@@ -102,7 +102,7 @@ public:
 
   // PRIVATE INSTANCE METHODS //
 private:
-  // De-templatize as much as possible. (The compiler may inline it all.)
+  // De-templatize as much as possible (although the compiler may inline it back).
   void getJustOpenedBinaryFileStatus(Status& status)
   {
     auto& [file, errorMessage, fileSize] = status;
@@ -121,15 +121,15 @@ private:
             if (file.good())
               fileSize = (endPosition - beginningPosition);
             else
-              errorMessage = "Can not read beginning position. ";
+              errorMessage = "Can not read file's beginning position.";
           } else
-            errorMessage = "Can not seek to the beginning. ";
+            errorMessage = "Can not seek to file's beginning.";
         } else
-          errorMessage = "Can not read end position. ";
+          errorMessage = "Can not read file's end position.";
       } else
-        errorMessage = "Can not seek to the end. ";
+        errorMessage = "Can not seek to file's end.";
     } else
-      errorMessage = "Can not open for reading. ";
+      errorMessage = "Can not open file for reading.";
   }
 
   // To not have to copy-and-paste the code above in the three following functions.
@@ -256,24 +256,22 @@ protected:
 
   // PROTECTED METHODS //
 protected:
-  template<typename Size, typename MethodName>
-  void throwException_DifferentSizes(Size const receiverSize,
-                                     Size const argumentSize,
-                                     MethodName const& methodName) const
+  template<typename Size>
+  void throwException_DifferentSizes(Size const receiverSize, Size const argumentSize, char const* methodName) const
   {
     throw std::logic_error(String(
       +"Receiver is of size ", receiverSize, +" and argument is of size ", argumentSize, +" in: ", methodName, '.'));
   }
 
-  template<typename Size, typename MethodName>
-  void throwException_CanNotResize(Size const receiverSize, Size const newSize, MethodName const& methodName) const
+  template<typename Size>
+  void throwException_CanNotResize(Size const receiverSize, Size const newSize, char const* methodName) const
   {
     throw std::logic_error(
       String(+"Receiver of size ", receiverSize, +" can not be resized (to ", newSize, +") in: ", methodName, '.'));
   }
 
-  template<typename Size, typename MethodName>
-  void throwException_CouldNotBeSized(Size const receiverSize, Size const newSize, MethodName const& methodName) const
+  template<typename Size>
+  void throwException_CouldNotBeSized(Size const receiverSize, Size const newSize, char const* methodName) const
   {
     throw std::runtime_error(String(
       +"Receiver's vector (of size ", receiverSize, +") could not be resized to ", newSize, +" in: ", methodName, '.'));
@@ -339,7 +337,7 @@ public:
       if (empty() or (size() == otherArray.size()))
         myVector = otherArray.myVector;
       else
-        throwException_DifferentSizes(size(), otherArray.size(), +__PRETTY_FUNCTION__);
+        throwException_DifferentSizes(size(), otherArray.size(), __PRETTY_FUNCTION__);
     }
 
     return *this;
@@ -355,7 +353,7 @@ public:
       if (empty() or (size() == otherArray.size()))
         myVector = std::move(otherArray.myVector);
       else
-        throwException_DifferentSizes(size(), otherArray.size(), +__PRETTY_FUNCTION__);
+        throwException_DifferentSizes(size(), otherArray.size(), __PRETTY_FUNCTION__);
     }
 
     return *this;
@@ -433,9 +431,9 @@ public:
     if (myVector.empty()) {
       myVector.resize(newSize);
       if (newSize != myVector.size())
-        throwException_CouldNotBeSized(myVector.size(), newSize, +__PRETTY_FUNCTION__);
+        throwException_CouldNotBeSized(myVector.size(), newSize, __PRETTY_FUNCTION__);
     } else if (newSize != myVector.size())
-      throwException_CanNotResize(size(), newSize, +__PRETTY_FUNCTION__);
+      throwException_CanNotResize(size(), newSize, __PRETTY_FUNCTION__);
   }
 
   void fill(Element const& value) noexcept(noexcept(myVector.assign(size(), value))) { myVector.assign(size(), value); }
@@ -447,7 +445,7 @@ public:
       if (size() == otherArray.size())
         myVector.swap(otherArray.myVector);
       else
-        throwException_DifferentSizes(size(), otherArray.size(), +__PRETTY_FUNCTION__);
+        throwException_DifferentSizes(size(), otherArray.size(), __PRETTY_FUNCTION__);
     }
   }
   /// @pre Throws an exception if both arguments are not of same size.
@@ -948,6 +946,7 @@ public:
 /** Generate random booleans using every bit of an (expensive) random integer
     provided in a shared/unique pointer, that is regenerated only when exhausted.
 */
+// Nothing to de-templatize.
 template<typename RandomIntegerPointer>
 class RandomBoolean
 {

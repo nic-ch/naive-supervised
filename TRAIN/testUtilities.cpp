@@ -97,14 +97,14 @@ TEST_CASE("OpenInputBinaryFileNamed()")
       auto [file, errorMessage, fileByteSize]{ OpenInputBinaryFileNamed("mpy5pvnp.4jmojvmg") };
 
       CHECK_UNARY_FALSE(file.good());
-      CHECK_EQ(errorMessage, "Can not open for reading. ");
+      CHECK_EQ(errorMessage, "Can not open file for reading.");
       CHECK_EQ(fileByteSize, 0);
     }
     {
       auto [file, errorMessage, fileByteSize]{ OpenInputBinaryFileNamed("7w20vp.dppt0t") };
 
       CHECK_UNARY_FALSE(file.good());
-      CHECK_EQ(errorMessage, "Can not open for reading. ");
+      CHECK_EQ(errorMessage, "Can not open file for reading.");
       CHECK_EQ(fileByteSize, 0);
     }
 
@@ -113,7 +113,7 @@ TEST_CASE("OpenInputBinaryFileNamed()")
       auto [file, errorMessage, fileByteSize]{ OpenInputBinaryFileNamed(cString) };
 
       CHECK_UNARY_FALSE(file.good());
-      CHECK_EQ(errorMessage, "Can not open for reading. ");
+      CHECK_EQ(errorMessage, "Can not open file for reading.");
       CHECK_EQ(fileByteSize, 0);
     }
     {
@@ -121,7 +121,7 @@ TEST_CASE("OpenInputBinaryFileNamed()")
       auto [file, errorMessage, fileByteSize]{ OpenInputBinaryFileNamed(cString) };
 
       CHECK_UNARY_FALSE(file.good());
-      CHECK_EQ(errorMessage, "Can not open for reading. ");
+      CHECK_EQ(errorMessage, "Can not open file for reading.");
       CHECK_EQ(fileByteSize, 0);
     }
   }
