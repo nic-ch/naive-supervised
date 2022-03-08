@@ -23,7 +23,7 @@ CPPCHECK2='/PACKAGES/cppcheck/cppcheck'
 AddCommand "$($CPPCHECK2 --version)" "$CPPCHECK2" "$CPPCHECK_FLAGS $1"
 
 # clang-tidy, space-separated list of clang-tidy versions to use.
-for VERSION in 13 14; do
+for VERSION in 14 15; do
   AddCommand "clang-tidy-$VERSION" "clang-tidy-$VERSION" "$CLANG_TIDY_FLAGS $1 --"
 done
 
