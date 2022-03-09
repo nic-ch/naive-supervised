@@ -471,8 +471,8 @@ class GoferThreadsPool
 public:
   using ErrandProcedure = std::function<void()>;
 
-  constexpr static size_t const MinimumGoferThreadsCount{ 1 };
-  constexpr static size_t const MaximumGoferThreadsCount{ 1024 };
+  constexpr static decltype(std::thread::hardware_concurrency()) const MinimumGoferThreadsCount{ 1 };
+  constexpr static decltype(std::thread::hardware_concurrency()) const MaximumGoferThreadsCount{ 1024 };
 
   // INSTANCE VARIABLES //
 private:
