@@ -241,18 +241,18 @@ class ArrayMixin
 {
   // DESTRUCTOR //
 protected:
-  ~ArrayMixin() = default;
+  ~ArrayMixin() noexcept = default;
 
   // CONSTRUCTORS //
 protected:
-  ArrayMixin() = default;
-  ArrayMixin(ArrayMixin const&) = default;
-  ArrayMixin(ArrayMixin&&) = default;
+  ArrayMixin() noexcept = default;
+  ArrayMixin(ArrayMixin const&) noexcept = default;
+  ArrayMixin(ArrayMixin&&) noexcept = default;
 
   // ASSIGNMENT OPERATORS //
 protected:
-  ArrayMixin& operator=(ArrayMixin const&) = default;
-  ArrayMixin& operator=(ArrayMixin&&) = default;
+  ArrayMixin& operator=(ArrayMixin const&) noexcept = default;
+  ArrayMixin& operator=(ArrayMixin&&) noexcept = default;
 
   // PROTECTED METHODS //
 protected:
@@ -315,7 +315,7 @@ public:
 
   // CONSTRUCTORS //
 public:
-  Array() = default;
+  Array() noexcept(noexcept(decltype(myVector)())) = default;
   explicit Array(size_t const size)
     : myVector(size)
   {
