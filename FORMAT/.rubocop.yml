@@ -21,6 +21,8 @@ Style/Copyright:
   Enabled: false
 Style/GlobalVars:
   Enabled: false
+Style/GuardClause:
+  Enabled: false
 Style/MissingElse:
   Enabled: false
 Style/Next:
