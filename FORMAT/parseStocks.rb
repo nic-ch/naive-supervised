@@ -170,7 +170,7 @@ class StocksParser
 
   # Extract the arguments. Abort on fatal errors.
   def extractArguments
-    if @arguments.size < 7
+    if @arguments.size < 8
       abort(
         "USAGE:\n\t",
         __FILE__,
@@ -180,6 +180,7 @@ class StocksParser
         "\n\t\t<begin train date>  <begin train time>" \
         "\n\t\t<end train date>  <end train time>" \
         "\n\t\t<begin gain timestamp>  <end gain timestamp>" \
+        "\n\t\t<maximum train timestamps gap size>" \
         "\n\t\t<CSV input file name>+" \
         "\n\n\t‡‡ timestamps are of form 'YYYY-MM-DD HH:MM'.\n"
       )
@@ -197,6 +198,12 @@ class StocksParser
     endTrainTimeString = @arguments.shift
     @beginGainTimestamp = @arguments.shift
     @endGainTimestamp = @arguments.shift
+    maximumTrainTimestampsGapSizeString = @arguments.shift
+    begin
+      @maximumTrainTimestampsGapSize = Integer(maximumTrainTimestampsGapSizeString, 10)
+    rescue ::StandardError
+      abort("'", maximumTrainTimestampsGapSizeString, "' can not be converted to a number gap size.\n")
+    end
     @inputFileNames = @arguments
 
     # Print back the extracted arguments.
@@ -210,6 +217,7 @@ class StocksParser
       "'.\n"
     )
     print("◦ Begin gain timestamp is '", @beginGainTimestamp, "', end gain timestamp '", @endGainTimestamp, "'.\n")
+    print('◦ Maximum train timestamps gap size is ', @maximumTrainTimestampsGapSize, ".\n")
 
     # Verify the timestamps.
     abort("Begin train timestamp is AFTER end train timestamp.\n") if @beginTrainTimestamp > @endTrainTimestamp
@@ -351,10 +359,10 @@ class StocksParser
     ensureThereAreStocks
 
     # Print about stock names gathered.
-    @sortedStockNames = @stockName_timestamp_amounts.keys.sort
-    print('◦ Gathered ', @sortedStockNames.size, " stock names.\n")
+    sortedStockNames = @stockName_timestamp_amounts.keys.sort
+    print('◦ Gathered ', sortedStockNames.size, " stock names.\n")
     # Validate stock name lengths.
-    lengthyStockNames = @sortedStockNames.select { |stockName| stockName.length >= stockNameMaximumLength }
+    lengthyStockNames = sortedStockNames.select { |stockName| stockName.length >= stockNameMaximumLength }
     unless lengthyStockNames.empty?
       abort(
         'The following stock name(s) contain ',
@@ -451,6 +459,7 @@ class StocksParser
     stockName_largestGapSize = {}
     # Mapping { stockName => gapsCount }.
     stockName_gapsCount = {}
+    stocksWithTooManyTrainTimestampsGaps = []
 
     @stockName_timestamp_amounts.each_pair do |stockName, timestamp_amounts|
       # Seek smallest timestamp >= @beginTrainTimestamp.
@@ -559,6 +568,8 @@ class StocksParser
         missingTrainTimestampsCount_stockNames[missingTrainTimestampsCount].append(stockName)
         stockName_largestGapSize[stockName] = largestGapSize
         stockName_gapsCount[stockName] = gapsCount
+
+        stocksWithTooManyTrainTimestampsGaps.append(stockName) if largestGapSize > @maximumTrainTimestampsGapSize
       end
     end
 
@@ -566,10 +577,23 @@ class StocksParser
     missingTrainTimestampsCount_stockNames.keys.sort.reverse.each do |missingTrainTimestampsCount|
       stockNames = missingTrainTimestampsCount_stockNames[missingTrainTimestampsCount]
       stockNames.map! do |stockName|
-        "'" + stockName + "' (in " + stockName_gapsCount[stockName].to_s + ' gaps of largest size ' + \
+        "'" + stockName + "' (in " + stockName_gapsCount[stockName].to_s + ' gaps of widest size ' + \
           stockName_largestGapSize[stockName].to_s + ')'
       end
       print('◦ Missed ', missingTrainTimestampsCount, ' train timestamps: ', stockNames.join(', '), ".\n")
+    end
+
+    unless stocksWithTooManyTrainTimestampsGaps.empty?
+      print(
+        "\n∙∙∙ The following ", \
+        stocksWithTooManyTrainTimestampsGaps.size, \
+        ' stocks with gap(s) wider than ', \
+        @maximumTrainTimestampsGapSize, \
+        ' will be ignored: ', \
+        stocksWithTooManyTrainTimestampsGaps.join("', '"), \
+        "'.\n"
+      )
+      stocksWithTooManyTrainTimestampsGaps.each { |stockName| @stockName_timestamp_amounts.delete(stockName) }
     end
   end
 
@@ -577,14 +601,15 @@ class StocksParser
   def outputTrainDataToTextFile(outputName)
     # Output to STOCKS_EVENT_<@fileNameInfix>_<outputName>.txt.
     outputFileName = 'EVENT_' + (@fileNameInfix ? (@fileNameInfix + '_') : '') + outputName + '.txt'
-    print("\n∙ OUTPUTTING TRAIN DATA TO TEXT FILE '", outputFileName, "'... ")
+    sortedStockNames = @stockName_timestamp_amounts.keys.sort
+    print("\n∙ OUTPUTTING train data for ", sortedStockNames.size, " stocks to text file '", outputFileName, "'... ")
 
     ensureThereAreStocks
 
     begin
       ::File.open(outputFileName, 'w') do |outputFile|
         # Output by sorted stock name.
-        @sortedStockNames.each do |stockName|
+        sortedStockNames.each do |stockName|
           timestamp_amounts = @stockName_timestamp_amounts[stockName]
           # Output '# stockName'.
           outputFile.print('# ', stockName, "\n# ", inputFilesHeader, "\n")
@@ -691,7 +716,14 @@ class StocksParser
   def outputTrainDataToBinaryFile
     # Output to STOCKS_EVENT_<@fileNameInfix>.bin.
     outputFileName = 'EVENT' + (@fileNameInfix ? ('_' + @fileNameInfix) : '') + '.bin'
-    print("\n∙ OUTPUTTING 16 bit unsigned TRAIN DATA TO BINARY FILE '", outputFileName, "'... ")
+    sortedStockNames = @stockName_timestamp_amounts.keys.sort
+    print(
+      "\n∙ OUTPUTTING 16 bit unsigned train data for ", \
+      sortedStockNames.size, \
+      " stocks to binary file '", \
+      outputFileName, \
+      "'... "
+    )
 
     ensureThereAreStocks
 
@@ -700,7 +732,7 @@ class StocksParser
         # Header: number of stock matrixes, matrix rows count, matrix columns count, stock name size.
         outputFile.print(
           [
-            @sortedStockNames.size,
+            sortedStockNames.size,
             @sortedTrainTimestamps.size,
             columnsCount,
             stockNameMaximumLength
@@ -709,7 +741,7 @@ class StocksParser
         )
 
         # Output by sorted stock names.
-        @sortedStockNames.each do |stockName|
+        sortedStockNames.each do |stockName|
           timestamp_amounts = @stockName_timestamp_amounts[stockName]
 
           packedStockName = stockName.dup
