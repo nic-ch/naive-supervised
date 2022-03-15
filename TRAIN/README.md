@@ -2,7 +2,7 @@
 
 The [main README](../README.md) sits in the parent directory.
 
-Please see the [C++ README](README_CPP.md) for everything specifically related to C++17.
+Please see the [C++ README](README_CPP.md) for everything specifically related to C++17, building and compiling.
 
 ---
 
@@ -89,28 +89,32 @@ $ ./run.sh testRandomsSpeeds.cpp
 
 ---
 
-## Patterns Used
+## Patterns and Best Practices
 
-The following are a number of my own interpretation of some patterns used in this project.
+The following are a number of my own interpretation of some patterns and best practices that shall be used in this project.
+
+### Strategy versus Template Method (NVI)
+
+Moreover, concerning class hierarchies, the [Strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern) shall be utilized as opposed to the [Template Method pattern](https://en.wikipedia.org/wiki/Template_method_pattern) or [Non-Virtual Interface pattern (NVI)](https://en.wikipedia.org/wiki/Non-virtual_interface_pattern), as one can assume that there shall be little invariant commonalities between a single layer networks and deeper learning networks.
 
 ### Interface
 
-***Interfaces*** are abstract classes that implement **no** functionality and only define a set of methods to be implemented by subclasses. *Interfaces* inherit only from other *Interfaces* and are characterized by:
+***Interfaces*** in C++ are abstract classes that implement **no** functionality and only define a set of methods to be implemented by subclasses. *Interfaces* inherit only from other *Interfaces* and are characterized by:
 
 * **No** instance variable.
-* Their *destructor* is **public virtual default** as they can be upcasted to to destruct subobjects.
-* Their *constructors* are **protected default** as they are "constructed" only within subobjects.
-* Their *copy, move operator=()* are **protected default** as they can be "assigned to" only within subobjects.
+* Their *destructor* is **public virtual noexcept default** as they can be upcasted to to destruct subobjects.
+* Their *constructors* are **protected noexcept default** as they are "constructed" only within subobjects.
+* Their *copy, move operator=()* are **protected noexcept default** as they can be "assigned to" only within subobjects.
 * **All** their instances methods are **public virtual pure**.
 
 ### Mixin
 
-***Mixins*** are classes that implement common generic functionality to be shared by subclasses that do not necessary have anything else in common. *Mixins* inherit only from other *Mixins* and are characterized by:
+***Mixins*** can be implemented in C++ through classes that implement common generic functionality to be shared by subclasses that do not necessary have anything else in common. *Mixins* inherit only from other *Mixins* and are characterized by:
 
 * **No** instance variable.
-* Their *destructor* is **protected** not virtual **default** as they are never upcasted to and are "destructed" within subobjects.
-* Their *constructors* are **protected** or **private** only as they are "constructed" only within subobjects.
-* Their *copy, move operator=()* are **protected** only as they can be "assigned to" only within subobjects.
+* Their *destructor* is **protected noexcept** not virtual **default** as they are never upcasted to and are "destructed" within subobjects.
+* Their *constructors* are **protected noexcept** or **private noexcept** only as they are "constructed" only within subobjects.
+* Their *copy, move operator=()* are **protected noexcept** only as they can be "assigned to" only within subobjects.
 
 ### Base Class
 
@@ -124,14 +128,52 @@ Any standard class with at least one **virtual pure** method is a ***Base Class*
 
 ---
 
+## Train
+
+File ***trainInputMatrices.cpp*** is the project's main C++17 file to be compiled. It *#includes* files ***SupervisedNetworksBases.hpp*** and ***NaiveSupervisedNetworks.hpp*** and contains only a `main()` function which first instantiates a `Logger`and then a `SupervisedNetworkTrainer` that is populated using the command line arguments. The `SupervisedNetworkTrainer` is then run.
+
+**All** exceptions are caught and logged into the logger. Signals `SIGABRT`, `SIGINT` (Ctrl-C by the user) and `SIGTERM` are set up to asynchronously **stop** the `SupervisedNetworkTrainer`.
+
+### Compile and Analyze
+
+***trainInputMatrices.cpp*** can be compiled and analyzed simply by invoking build script `build.sh`[^1]:
+
+[^1]: [C++ README](README_CPP.md).
+
+```
+$ ./build.sh trainInputMatrices.cpp
+```
+
+### Run it
+
+```
+$ ./trainInputMatrices
+
+Usage: ./trainInputMatrices
+       <maximum number of training cycles>
+       <number of training threads, 0 for hardware threads ÷ 2>
+       [ <desired matrix name>  <event file name>  ]+
+       [ <weights file name> ]
+
+```
+
+---
+
 ## Supervised Networks Bases
+
+File ***SupervisedNetworksBases.hpp*** contain the following classes:
+
+* ***WeightsCrafter*** is the abstract base class for all the weights crafting classes. 
+* ***MatrixDigraph***
+* ***SupervisedNetworkEvent***
+* ***SupervisedNetworkTrainer***
+
+
 
 ---
 
 ## Naïve Supervised Networks
 
----
-
-## Train
+File ***NaiveSupervisedNetworks.hpp***
 
 ---
