@@ -328,6 +328,6 @@ The first `f()` will catch all C strings, that will be implicitly converted on t
 
 ## Type Erasure
 
-The various ***Type Erasure*** propositions sit in file [Type Erasure README](TYPE_ERASURE_README.md).
+The various ***Type Erasure*** propositions sit in file [Type Erasure README](README_TE.md).
 
 ---

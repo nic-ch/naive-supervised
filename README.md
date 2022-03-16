@@ -97,7 +97,7 @@ Please see the [format README](FORMAT/README.md) in directory *FORMAT*.
 
 Please see [train README](TRAIN/README.md) in directory *TRAIN* for the general methods and algorithms used for training.
 
-Please see [C++ README_CPP](TRAIN/README_CPP.md) in directory *TRAIN* for everything related to C++17.
+Please see [C++ README](TRAIN/README_CPP.md) in directory *TRAIN* for everything related to C++17.
 
 ---
 
