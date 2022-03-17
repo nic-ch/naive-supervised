@@ -4,18 +4,38 @@
 
 # Naïve Supervised Learning Network - Getting Started
 
+## License
+
 *All trademarks are the property of their respective owners.*
 
-## Done and Working
+Copyright 2022 Nicolas Chaussé (nicolaschausse@protonmail.com)
 
-### Clone the Repository
+    This project is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+## WARNING: This first approximation is ***far*** from deep learning and will most likely not predict anything at all.
+
+Please be mindful of the license above that states this comes:
+
+> "WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+
+## Clone the Repository
 
 ```
 $ git clone https://github.com/nic-ch/naive-supervised.git
 $ cd naive-supervised
 ```
 
-### Download Weekly Stocks Training Data
+## Download Weekly Stocks Training Data
 
 To use script ***FORMAT/downloadStocks.rb***, get your own KEY and create your own ***stock_list.csv*** file, please see **Obtain Stocks Training Data** in [README](README.md).
 
@@ -27,7 +47,7 @@ $ cd WEEK_<i>
 $ ../FORMAT/downloadStocks.rb KEY < stock_list.csv
 ```
 
-### Parse, Normalize and Format the Weekly Training Data
+## Parse, Normalize and Format the Weekly Training Data
 
 Parse, normalize and format each downloaded weekly stocks training data using script ***FORMAT/parseStocks.rb***. To see its usage, invoke it without arguments:
 
@@ -48,7 +68,7 @@ $
 
 For a description of its the input and output files formats, please see [format README](FORMAT/README.md) in directory *FORMAT*.
 
-### Example: Week 1
+## Example: Week 1
 
 Let's take Week 1 as an example where stocks training data were downloaded for stocks A, B and C and where Monday happens on 2022-01-10, Thursday on 2022-01-13, and Friday on 2022-01-14.
 
@@ -87,7 +107,9 @@ It is crucial for the other weeks that we always train on exactly the **same** *
 
 Again, please see [format README](FORMAT/README.md) in directory *FORMAT* for a description of all these files' formats.
 
-## Yet To Do: Train and Predict
+## Initial Ambitions
+
+The following is what was the initially ambition and section **Reality** below describes what was achieved.
 
 ### Train
 
@@ -122,3 +144,57 @@ Still on Thursday night, we shall then try to predict what stock will gain most 
 ```
 $ predict WEEK_4_THURSDAY_NIGHT/EVENT_<date>.bin weights.bin
 ```
+
+## Reality
+
+### Build Main Program *trainInputMatrices.cpp*
+
+
+As described in the [train README](TRAIN/README.md), ***trainInputMatrices.cpp*** in directory ***TRAIN*** can be compiled and analyzed simply by invoking build script `build.sh`[^1]. To build, compile, analyze and run any of the programs following, please see the [C++ README](TRAIN/README_CPP.md) in directory *TRAIN*.
+
+
+```
+$ ./build.sh trainInputMatrices.cpp
+```
+
+Depending on what compiler is installed on your PC, you should get a number of executables, e.g.:
+
+* `trainInputMatrices_GNU-10`
+* `trainInputMatrices_GNU-11`
+* `trainInputMatrices_LLVM-13`
+* `trainInputMatrices_LLVM-14`
+* `trainInputMatrices_LLVM-15`
+
+These are essentially to allow to performance-test the same program under different compilers, as `trainInputMatrices` logs cycles per second for learning, every minute.
+
+### Train
+
+Make your own training directory and copy a number of ***EVENT_date.bin*** files generated above. Run a `trainInputMatrices` with no argument.
+
+```
+$ ../TRAIN/trainInputMatrices_GNU-11
+
+Usage: '../TRAIN/trainInputMatrices_GNU-11'
+       <maximum number of training cycles>
+       <number of training threads, 0 for hardware threads ÷ 2>
+       [ <desired matrix name>  <event file name>  ]+
+       [ <weights file name> ]
+```
+
+Then run something like the following to train:
+
+```
+$ ../TRAIN/trainInputMatrices_GNU-11  1000000  4  A  EVENT_1.bin  B  EVENT_2.bin  ...
+```
+
+This shall produce a *weights* binary file at the end, or when you hit Ctrl-C. 
+
+### Predict
+
+Once you get a weights file, of the form `WEIGHTS_...`, predict with the weeks' stocks downloaded a Thursday night as follow:
+
+```
+$ ../TRAIN/trainInputMatrices_GNU-11  1  1  A  THURSDAY_NIGHT_EVENT.bin  WEIGHTS_...
+```
+
+Please see [train README](TRAIN/README.md) for all the technical details.
