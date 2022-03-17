@@ -1,12 +1,10 @@
+[Back](README.md)
+
 ![Supervised Learning Logo](logoDigraph.png)
 
 # Naïve Supervised Learning Network - Getting Started
 
-See the [main README](README.md).
-
 *All trademarks are the property of their respective owners.*
-
----
 
 ## Done and Working
 
@@ -89,8 +87,6 @@ It is crucial for the other weeks that we always train on exactly the **same** *
 
 Again, please see [format README](FORMAT/README.md) in directory *FORMAT* for a description of all these files' formats.
 
----
-
 ## Yet To Do: Train and Predict
 
 ### Train
@@ -126,5 +122,3 @@ Still on Thursday night, we shall then try to predict what stock will gain most 
 ```
 $ predict WEEK_4_THURSDAY_NIGHT/EVENT_<date>.bin weights.bin
 ```
-
----

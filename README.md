@@ -4,8 +4,6 @@
 
 A step-by-step tutorial is available in [Getting Started](GETTING_STARTED.md).
 
----
-
 ## License
 
 *All trademarks are the property of their respective owners.*
@@ -23,8 +21,6 @@ Copyright 2022 Nicolas Chaussé (nicolaschausse@protonmail.com)
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
----
 
 ## Introduction
 
@@ -48,8 +44,6 @@ The approach to eat that elephant, perhaps naïvely, will be to:
 1. Normalize and format the training data.
 1. Train on the formatted training data.
 1. Predict what stocks will gain the most on a weekly basis.
-
----
 
 ## Obtain Stocks Training Data
 
@@ -85,13 +79,9 @@ timestamp,open,high,low,close,volume
 
 **For the rest of this project, stocks training data need to be downloaded on each Saturday, so to have data at least for the corresponding week's Monday to Friday, 9:31 to 16:30.**
 
----
-
 ## Normalize and Format
 
 Please see the [format README](FORMAT/README.md) in directory *FORMAT*.
-
----
 
 ## Train
 
@@ -99,10 +89,6 @@ Please see [train README](TRAIN/README.md) in directory *TRAIN* for the general 
 
 Please see [C++ README](TRAIN/README_CPP.md) in directory *TRAIN* for everything related to C++17.
 
----
-
 ## Predict
 
 An ultimate goal of this project is to download stocks data for several week periods, train on them according to their performance on a pre-determined gain time period, and then predict the best stock for the coming gain time period.
-
----

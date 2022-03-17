@@ -1,10 +1,8 @@
+[Back](../README.md)
+
 # Train the Formatted Inputs
 
-The [main README](../README.md) sits in the parent directory.
-
 Please see the [C++ README](README_CPP.md) for everything specifically related to C++17, building and compiling.
-
----
 
 ## License
 
@@ -24,8 +22,6 @@ Copyright 2022 Nicolas Chaussé (nicolaschausse@protonmail.com)
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
----
-
 ## Introduction
 
 As stated in [Getting Started](GETTING_STARTED.md), we now want to develop a Supervised Learning train and predict program that shall be called as follows to train:
@@ -43,8 +39,6 @@ $ predict WEEK_4_THURSDAY_NIGHT/EVENT_<date>.bin weights.bin
 ```
 
 To build, compile, analyze and run any of the programs following, please see the [C++ README](README_CPP.md) in directory *TRAIN*.
-
----
 
 ## Utilities
 
@@ -65,8 +59,6 @@ A number of utility classes and static functions have been defined in include fi
 * ***RandomBoolean*** uses every bit of an expensive random integer to provide random booleans.
 * ***Timer*** times to the microsecond and prints on any `std::basic_ostream`.
 
----
-
 ## Testing
 
 * ***testUtilities.cpp*** tests all utility procedures and classes, and uses C++ testing framework [doctest](https://github.com/doctest/doctest). To run it:
@@ -86,47 +78,6 @@ $ ./run.sh testCollectionsSpeeds.cpp
 ```
 $ ./run.sh testRandomsSpeeds.cpp
 ```
-
----
-
-## Patterns and Best Practices
-
-The following are a number of my own interpretation of some patterns and best practices that shall be used in this project.
-
-### Strategy versus Template Method (NVI)
-
-Moreover, concerning class hierarchies, the [Strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern) shall be utilized as opposed to the [Template Method pattern](https://en.wikipedia.org/wiki/Template_method_pattern) or [Non-Virtual Interface pattern (NVI)](https://en.wikipedia.org/wiki/Non-virtual_interface_pattern), as one can assume that there shall be little invariant commonalities between a single layer networks and deeper learning networks.
-
-### Interface
-
-***Interfaces*** in C++ are abstract classes that implement **no** functionality and only define a set of methods to be implemented by subclasses. *Interfaces* inherit only from other *Interfaces* and are characterized by:
-
-* **No** instance variable.
-* Their *destructor* is **public virtual noexcept default** as they can be upcasted to to destruct subobjects.
-* Their *constructors* are **protected noexcept default** as they are "constructed" only within subobjects.
-* Their *copy, move operator=()* are **protected noexcept default** as they can be "assigned to" only within subobjects.
-* **All** their instances methods are **public virtual pure**.
-
-### Mixin
-
-***Mixins*** can be implemented in C++ through classes that implement common generic functionality to be shared by subclasses that do not necessary have anything else in common. *Mixins* inherit only from other *Mixins* and are characterized by:
-
-* **No** instance variable.
-* Their *destructor* is **protected noexcept** not virtual **default** as they are never upcasted to and are "destructed" within subobjects.
-* Their *constructors* are **protected noexcept** or **private noexcept** only as they are "constructed" only within subobjects.
-* Their *copy, move operator=()* are **protected noexcept** only as they can be "assigned to" only within subobjects.
-
-### Base Class
-
-***Base Classes*** implement states and functionality common to their all subclasses. They are characterized by:
-
-* Their *destructor* is **public virtual** as *Base Classes* can be upcasted to to destruct subobjects.
-* Their *constructors* are **protected** or **private** only as *Base Classes* are constructed only within subobjects.
-* Their *copy, move operator=()* are **protected** only as *Base Classes* are assigned to only within subobjects.
-
-Any standard class with at least one **virtual pure** method is a ***Base Class***.
-
----
 
 ## Train
 
@@ -154,26 +105,26 @@ Usage: ./trainInputMatrices
        <number of training threads, 0 for hardware threads ÷ 2>
        [ <desired matrix name>  <event file name>  ]+
        [ <weights file name> ]
-
 ```
 
----
+## Patterns Used
+
+### Strategy versus Template Method (NVI)
+
+In the class hierarchy above, the [Strategy pattern](https://en.wikipedia.org/wiki/Str    ategy_pattern) shall be utilized as opposed to the [Template Method pattern](https://en.wikipedi    a.org/wiki/Template_method_pattern) or [Non-Virtual Interface pattern (NVI)](https://en.wikipedi    a.org/wiki/Non-virtual_interface_pattern), as one can assume that there shall be little invarian    t commonalities between a single layer networks and deeper learning networks.
 
 ## Supervised Networks Bases
 
-File ***SupervisedNetworksBases.hpp*** contain the following classes:
+File ***SupervisedNetworksBases.hpp*** contains the following classes:
 
-* ***WeightsCrafter*** is the abstract base class for all the weights crafting classes. 
-* ***MatrixDigraph***
-* ***SupervisedNetworkEvent***
-* ***SupervisedNetworkTrainer***
-
-
-
----
+* ***WeightsCrafter*** is the abstract base class for all the weights crafting classes. It holds all the ***weights*** and the crucially important *random integer* and *random boolean*. It also declares pure virtual functions `weightsImproved()` and `weightsDidNotImprove()` to be implemented by the concrete weights crafter subclasses.
+* ***MatrixDigraph*** is the abstract base class for all the matrix digraph classes.
+* ***SupervisedNetworkEvent*** builds a vector of *MatrixDigraphs* according to a provided file 'EVENT....bin' produced by script *FORMAT/parseStocks.rb*.
+* ***SupervisedNetworkTrainer*** is the verbose class and logs every action and every progress. It first parses and validates the provided command line arguments, and then builds a vector of *SupervisedNetworkEvents*, a *WeightsCrafter* as well as a *GoferThreadsPool* accordingly. It then continuously applies the *WeightsCrafter*'s weights to all the *MatrixDigraphs* through the *SupervisedNetworkEvent*.
 
 ## Naïve Supervised Networks
 
-File ***NaiveSupervisedNetworks.hpp***
+File ***NaiveSupervisedNetworks.hpp*** contains:
 
----
+* Concrete class ***GeometricWeightsCrafter*** that crudely randomizes weights in a geometric way, so to oscillate as much as possible between randomizing all to only one weight. Of course, it implements functions `weightsImproved()` and `weightsDidNotImprove()`.
+* Concrete class ***LogarithmicMatrixDigraph*** that logarithmically deceases the number of inputs to a single sink output value. This is only a first approximation and is **far** from deep learning.

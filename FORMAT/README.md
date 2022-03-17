@@ -1,8 +1,6 @@
+[Back](../README.md)
+
 # Normalize and Format the Training Data
-
-The [main README](../README.md) sits in the parent directory.
-
----
 
 ## License
 
@@ -22,13 +20,9 @@ Copyright 2022 Nicolas Chaussé (nicolaschausse@protonmail.com)
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
----
-
 ## Introduction
 
 As illustrated in [Getting Started](GETTING_STARTED.md), Ruby script ***FORMAT/parseStocks.rb*** is used to parse, normalize and format each downloaded weekly stocks training data, as well as list the stocks with the highest gains. The following sections explain its main points.
-
----
 
 ![Ruby Logo](logoRuby.png)[^1]
 
@@ -39,8 +33,6 @@ Ruby can be seen as a happy blend of Perl 5 and Smalltalk, plus a dose of Scheme
 ### Static Analysis
 
 Awesome static analyzer [RuboCop](https://rubocop.org/) is used continually in this project as it detects bad habits and even bugs. Almost all *cops* are enable except a few listed in *.rubocop.yml* such as *Metrics* and *Naming*, but also a few odd-looking ones such as *Style/MissingElse* and *Style/Next*.
-
----
 
 ## Script ***FORMAT/parseStocks.rb***
 
@@ -174,8 +166,6 @@ The maximum (thus global) range percentage is A's 40%. The globally rescaled pri
 
 Outputs in a text file the brute and normalized stocks, then **finally** the normalized stocks in a binary file to be used for training!
 
----
-
 ## Testing
 
 The script' test suite partially meta-programs Ruby itself so to self-encapsulate the script, so to invoke it as a user would. When invoking the script in test mode, its test suite catches all `abort` calls made by the script (via `rescue ::SystemExit`). Moreover, it temporarily "hijacks" $stderr and $stdout and redirects them into its own strings (through `$stderr = ::StringIO.new`). This allows the test suite to invoke the script in a completely silent mode and harvest all the script's outputs and error messages. The test suite can then output its own error or success messages depending on the script's original results.
@@ -207,5 +197,3 @@ New test cases are simply defined as follows and added to the `@@testSymbols` ar
 ```
 ∙ newTest: Passed.
 ```
-
----
