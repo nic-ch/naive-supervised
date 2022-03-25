@@ -170,7 +170,7 @@ class StocksParser
 
   # Extract the arguments. Abort on fatal errors.
   def extractArguments
-    if @arguments.size < 8
+    if @arguments.size < 9
       abort(
         "USAGE:\n\t",
         __FILE__,
@@ -181,6 +181,7 @@ class StocksParser
         "\n\t\t<end train date>  <end train time>" \
         "\n\t\t<begin gain timestamp>  <end gain timestamp>" \
         "\n\t\t<maximum train timestamps gap size>" \
+        "\n\t\t<maximum price range fraction> (0 for the calculated one)" \
         "\n\t\t<CSV input file name>+" \
         "\n\n\t‡‡ timestamps are of form 'YYYY-MM-DD HH:MM'.\n"
       )
@@ -200,9 +201,18 @@ class StocksParser
     @endGainTimestamp = @arguments.shift
     maximumTrainTimestampsGapSizeString = @arguments.shift
     begin
-      @maximumTrainTimestampsGapSize = Integer(maximumTrainTimestampsGapSizeString, 10)
+      @maximumTrainTimestampsGapSize = Integer(maximumTrainTimestampsGapSizeString)
     rescue ::StandardError
       abort("'", maximumTrainTimestampsGapSizeString, "' can not be converted to a number gap size.\n")
+    end
+    maximumPriceRangeFraction = @arguments.shift
+    begin
+      @maximumPriceRangeFraction = Float(maximumPriceRangeFraction)
+    rescue ::StandardError
+      abort("'", maximumPriceRangeFraction, "' can not be converted to a maximum price range fraction.\n")
+    end
+    if (@maximumPriceRangeFraction > 1.0) || (@maximumPriceRangeFraction < 0.0)
+      abort("Maximum price range fraction ('", maximumPriceRangeFraction, "') must be between 0 and 1.0.\n")
     end
     @inputFileNames = @arguments
 
@@ -218,6 +228,13 @@ class StocksParser
     )
     print("◦ Begin gain timestamp is '", @beginGainTimestamp, "', end gain timestamp '", @endGainTimestamp, "'.\n")
     print('◦ Maximum train timestamps gap size is ', @maximumTrainTimestampsGapSize, ".\n")
+    print(
+      '◦ Maximum price range fraction is ',
+      @maximumPriceRangeFraction,
+      ' (',
+      Rational(@maximumPriceRangeFraction),
+      ").\n"
+    )
 
     # Verify the timestamps.
     abort("Begin train timestamp is AFTER end train timestamp.\n") if @beginTrainTimestamp > @endTrainTimestamp
@@ -651,7 +668,7 @@ class StocksParser
 
     # Rescale each stock price to the maximum stock price range, as they typically do not vary widely.
     # Do not rescale volumes as they typically vary widely.
-    maximumPriceRangeFraction = 0r
+    calculatedMaximumPriceRangeFraction = 0r
     # Opportunistically gather the maximum price for each stock.
     stockName_maximumPrice = {}
     @stockName_timestamp_amounts.each_pair do |stockName, timestamp_amounts|
@@ -668,17 +685,26 @@ class StocksParser
 
       # Compute the maximum price range fraction of all stocks.
       priceRangeFraction = Rational(maximumPrice - minimumPrice) / maximumPrice
-      maximumPriceRangeFraction = priceRangeFraction if priceRangeFraction > maximumPriceRangeFraction
+      if priceRangeFraction > calculatedMaximumPriceRangeFraction
+        calculatedMaximumPriceRangeFraction = priceRangeFraction
+      end
     end
 
-    print("\n∙∙∙  MAXIMUM PRICE RANGE FRACTION IS ", Float(maximumPriceRangeFraction).round(6), ".\n")
+    maximumPriceRangeFraction = Rational(@maximumPriceRangeFraction)
+    print("\n∙∙∙  Calculated maximum price range fraction is ", Float(calculatedMaximumPriceRangeFraction).round(6))
+    if calculatedMaximumPriceRangeFraction > maximumPriceRangeFraction
+      print(" AND WILL BE USED.\n.")
+    else
+      calculatedMaximumPriceRangeFraction = maximumPriceRangeFraction
+      print(' but ', @maximumPriceRangeFraction, " will be used.\n")
+    end
 
     # Rescale, and reproportion prices to new interval 1..(2^16 - 1).
     maximumPriceAmount = maximumAmount - 1
     @stockName_timestamp_amounts.each_pair do |stockName, timestamp_amounts|
       # Maximum stock price rescaled according to the maximum price range fraction.
       maximumPrice = stockName_maximumPrice[stockName]
-      rescaledMaximumPrice = maximumPriceRangeFraction * maximumPrice
+      rescaledMaximumPrice = calculatedMaximumPriceRangeFraction * maximumPrice
       # Compute the rescale delta.
       rescaleDelta = maximumPrice - rescaledMaximumPrice
 
@@ -790,7 +816,7 @@ class StocksParser
   @@testSymbols.push(:testOneTooFewArgument)
   # Call the script with too few arguments.
   def testOneTooFewArgument
-    if testParseStocks(__method__, [1, 2, 3, 4, 5, 6]) && @stderr.include?('FATAL ERROR! USAGE:')
+    if testParseStocks(__method__, [1, 2, 3, 4, 5, 6, 7, 8]) && @stderr.include?('FATAL ERROR! USAGE:')
       testPassed
     else
       testFailed
@@ -800,7 +826,7 @@ class StocksParser
   @@testSymbols.push(:testTimestampsOutOfOrder)
   # Call the script with timestamps reversed.
   def testTimestampsOutOfOrder
-    arguments = ['2022-01-11', '11:07', '2022-01-11', '11:06', '2022-02-12 09:31', '2022-02-12 16:00', 'a']
+    arguments = ['2022-01-11', '11:07', '2022-01-11', '11:06', '2022-02-12 09:31', '2022-02-12 16:00', 100, 0, 'a']
     if testParseStocks(__method__, arguments.dup) && \
        @stderr.include?('Begin train timestamp is AFTER end train timestamp.')
 
@@ -821,7 +847,7 @@ class StocksParser
   @@testSymbols.push(:testTimestampsCountGenerated_CanNotReadFile)
   # Call the script with timestamps out of order and a non-existing file name.
   def testTimestampsCountGenerated_CanNotReadFile
-    arguments = ['2022-01-11', '09:31', '2022-01-15', '16:00', '2022-02-12 09:31', '2022-02-12 16:00', '/a']
+    arguments = ['2022-01-11', '09:31', '2022-01-15', '16:00', '2022-02-12 09:31', '2022-02-12 16:00', 100, 0, '/a']
     # Should abort as no file will be read. 9:31 to 16:00 is exactly 6.5 hours * 60 minutes * 5 days = 1950 timestamps.
     if testParseStocks(__method__, arguments) && @stderr.include?('No stock were parsed.') \
        && @stdout.include?('1950 TRAIN TIMESTAMP(S) WERE GENERATED.') && @stdout.include?('Can not read file.')
@@ -838,7 +864,7 @@ class StocksParser
     fileName = 'A.csv'
     ::File.open(fileName, 'w') { |outputFile| outputFile.print("Hello\n") }
 
-    arguments = ['2022-01-11', '11:01', '2022-01-11', '11:10', '2022-02-12 09:31', '2022-02-12 16:00', fileName]
+    arguments = ['2022-01-11', '11:01', '2022-01-11', '11:10', '2022-02-12 09:31', '2022-02-12 16:00', 100, 0, fileName]
     if testParseStocks(__method__, arguments) && @stderr.include?('No stock were parsed.') \
        && @stdout.include?('does not match header')
 
@@ -857,7 +883,7 @@ class StocksParser
       outputFile.print("Hello\n")
     end
 
-    arguments = ['2022-01-11', '11:01', '2022-01-11', '11:10', '2022-02-12 09:31', '2022-02-12 16:00', fileName]
+    arguments = ['2022-01-11', '11:01', '2022-01-11', '11:10', '2022-02-12 09:31', '2022-02-12 16:00', 100, 0, fileName]
     if testParseStocks(__method__, arguments) && @stderr.include?('No stock were parsed.') \
        && !@stdout.include?('does not match header') && @stdout.include?('1 line(s) ignored.')
 
@@ -879,7 +905,7 @@ class StocksParser
     end
 
     # Disjoint timestamps.
-    arguments = ['2022-01-11', '11:01', '2022-01-11', '11:10', '2022-02-12 09:31', '2022-02-12 16:00', fileName]
+    arguments = ['2022-01-11', '11:01', '2022-01-11', '11:10', '2022-02-12 09:31', '2022-02-12 16:00', 100, 0, fileName]
     if testParseStocks(__method__, arguments) && @stderr.include?('No stock were parsed.') \
        && @stdout.include?('Gathered: 0 train and 0 gain timestamps.') && @stdout.include?('Stock ignored.')
 
@@ -906,7 +932,7 @@ class StocksParser
       outputFile.print("2022-01-11 13:00:00, 1.0000, 2.0000, 1.0000, 2.0000, 123\n")
     end
 
-    arguments = ['2022-01-11', '13:00', '2022-01-11', '13:01', '2022-01-11 13:00', '2022-01-11 13:01', fn1, fn2]
+    arguments = ['2022-01-11', '13:00', '2022-01-11', '13:01', '2022-01-11 13:00', '2022-01-11 13:01', 100, 0, fn1, fn2]
     if testParseStocks(__method__, arguments)
       if @stdout.include?("The following stock name(s) contain 16 characters or more: '123456789012345'.") \
          || !@stderr.include?("The following stock name(s) contain 16 characters or more: '1234567890123456'.")
@@ -935,7 +961,7 @@ class StocksParser
       outputFile.print("2022-01-11 13:00:00, 1.0000, 2.0000, 1.0000, 2.0000, 123\n")
     end
 
-    arguments = ['2022-01-11', '13:00', '2022-01-11', '13:01', '2022-01-11 13:00', '2022-01-11 13:01', fn1, fn2]
+    arguments = ['2022-01-11', '13:00', '2022-01-11', '13:01', '2022-01-11 13:00', '2022-01-11 13:01', 100, 0, fn1, fn2]
     if testParseStocks(__method__, arguments)
       if @stdout.include?('Gathered 1 to 2 timestamps.') \
          && @stderr.include?('First and last train timestamps are the same.')
@@ -993,7 +1019,19 @@ class StocksParser
     ::File.open(fn2, 'w') { |outputFile| d2.each { |line| outputFile.print(line, "\n") } }
     ::File.open(fn3, 'w') { |outputFile| e.each { |line| outputFile.print(line, "\n") } }
 
-    arguments = ['2022-01-15', '10:01', '2022-01-15', '10:03', '2022-01-15 10:01', '2022-01-15 10:03', fn1, fn2, fn3]
+    arguments = [
+      '2022-01-15', \
+      '10:01', \
+      '2022-01-15', \
+      '10:03', \
+      '2022-01-15 10:01', \
+      '2022-01-15 10:03', \
+      100, \
+      0, \
+      fn1, \
+      fn2, \
+      fn3 \
+    ]
     if testParseStocks(__method__, arguments)
       testFailed
     else
@@ -1041,7 +1079,7 @@ class StocksParser
     fileName = 'G'
     ::File.open(fileName, 'w') { |outputFile| original.each { |line| outputFile.print(line, "\n") } }
 
-    arguments = ['2022-01-01', '09:31', '2022-01-01', '09:34', '2022-01-01 09:31', '2022-01-01 09:34', fileName]
+    arguments = ['2022-01-01', '09:31', '2022-01-01', '09:34', '2022-01-01 09:31', '2022-01-01 09:34', 100, 0, fileName]
     if !testParseStocks(__method__, arguments) && (bruteFile = ::Dir.glob('*brute*')&.first)
       brute = ::File.readlines(bruteFile, chomp: true)
       if brute.eql?(manual)
@@ -1101,7 +1139,7 @@ class StocksParser
     ::File.open(fn1, 'w') { |outputFile| a.each { |line| outputFile.print(line, "\n") } }
     ::File.open(fn2, 'w') { |outputFile| b.each { |line| outputFile.print(line, "\n") } }
 
-    arguments = ['2022-01-15', '10:01', '2022-01-15', '10:03', '2022-01-15 10:01', '2022-01-15 10:03', fn1, fn2]
+    arguments = ['2022-01-15', '10:01', '2022-01-15', '10:03', '2022-01-15 10:01', '2022-01-15 10:03', 100, 0, fn1, fn2]
     if !testParseStocks(__method__, arguments) && (bruteFile = ::Dir.glob('*brute*')&.first) \
        && (normalizedFile = ::Dir.glob('*normalized*')&.first) \
 
@@ -1115,6 +1153,49 @@ class StocksParser
       end
     else
       testFailed
+    end
+  end
+
+  @@testSymbols.push(:testMaximumTrainTimestampsGapSize)
+  def testMaximumTrainTimestampsGapSize
+    if testParseStocks(__method__, ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']) && \
+       @stderr.include?('can not be converted to a number gap size.')
+
+      testPassed
+    else
+      testFailed
+    end
+  end
+
+  @@testSymbols.push(:testmaximumPriceRangeFraction)
+  def testmaximumPriceRangeFraction
+    arguments = ['a', 'b', 'c', 'd', 'e', 'f', 100, 'h', 'i']
+    if testParseStocks(__method__, arguments.dup) && \
+       @stderr.include?('can not be converted to a maximum price range fraction.')
+
+      testPassed('Non number')
+    else
+      testFailed('Non number')
+    end
+
+    arguments[7] = '-1'
+    if testParseStocks(__method__, arguments.dup) && \
+       @stderr.include?('Maximum price range fraction') && \
+       @stderr.include?('must be between 0 and 1.0.')
+
+      testPassed('-1')
+    else
+      testFailed('-1')
+    end
+
+    arguments[7] = '1.1'
+    if testParseStocks(__method__, arguments.dup) && \
+       @stderr.include?('Maximum price range fraction') && \
+       @stderr.include?('must be between 0 and 1.0.')
+
+      testPassed('1.1')
+    else
+      testFailed('1.1')
     end
   end
 

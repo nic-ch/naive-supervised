@@ -52,17 +52,19 @@ $ ../FORMAT/downloadStocks.rb KEY < stock_list.csv
 Parse, normalize and format each downloaded weekly stocks training data using script ***FORMAT/parseStocks.rb***. To see its usage, invoke it without arguments:
 
 ```
-$ FORMAT/parseStocks.rb 
+$ FORMAT/parseStocks.rb
 USAGE:
-	FORMAT/parseStocks.rb  TEST    ‡ ALL other arguments will be IGNORED.
+    FORMAT/parseStocks.rb  TEST    ‡ ALL other arguments will be IGNORED.
 -- OR --
-	FORMAT/parseStocks.rb
-		<begin train date>  <begin train time>
-		<end train date>  <end train time>
-		<begin gain timestamp>  <end gain timestamp>
-		<CSV input file name>+
+    FORMAT/parseStocks.rb
+        <begin train date>  <begin train time>
+        <end train date>  <end train time>
+        <begin gain timestamp>  <end gain timestamp>
+        <maximum train timestamps gap size>
+        <maximum price range fraction> (0 for the calculated one)
+        <CSV input file name>+
 
-	‡‡ timestamps are of form 'YYYY-MM-DD HH:MM'.
+    ‡‡ timestamps are of form 'YYYY-MM-DD HH:MM'.
 $
 ```
 
@@ -81,6 +83,7 @@ $ cd WEEK_1
 $ ../FORMAT/parseStocks.rb '2022-01-10' '09:31' \
                            '2022-01-13' '16:00' \
                            '2022-01-14 09:31' '2022-01-14 16:00' \
+                           10 0 \
                            *.csv
 ```
 
@@ -134,6 +137,7 @@ $ ../FORMAT/downloadStocks.rb KEY < stock_list.csv
 $ ../FORMAT/parseStocks.rb '2022-01-10' '09:31' \
                            '2022-01-13' '16:00' \
                            '2022-01-13 09:31' '2022-01-13 16:00' \
+                           10 0 \
                            *.csv
 ```
 
