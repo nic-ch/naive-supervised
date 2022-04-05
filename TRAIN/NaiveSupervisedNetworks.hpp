@@ -107,11 +107,9 @@ private:
   // Randomize which weights are to be altered as well as up or down.
   void randomizeAlterings()
     // noexcept if instantiating and calling a std::geometric_distribution are both noexcept.
-    noexcept(
-      noexcept(std::geometric_distribution<decltype((*myRandomIntegerPointer)())>())
-      and noexcept(std::geometric_distribution<decltype((*myRandomIntegerPointer)())>()(*myRandomIntegerPointer))
-      and noexcept((*myRandomIntegerPointer)())
-      and noexcept(myRandomBoolean()))
+    noexcept(noexcept(std::geometric_distribution<decltype((*myRandomIntegerPointer)())>()) and noexcept(
+      std::geometric_distribution<decltype((*myRandomIntegerPointer)())>()(
+        *myRandomIntegerPointer)) and noexcept((*myRandomIntegerPointer)()) and noexcept(myRandomBoolean()))
   {
     // Not crawling to local maximum (anymore).
     myCrawlToLocalMaximum = false;
@@ -233,9 +231,8 @@ public:
   }
 
   /// The latest weights improved, re-alter accordingly.
-  void weightsImproved()
-    noexcept(noexcept(rememberWeights()) and noexcept(alterWeights()) and noexcept(randomizeAlterings()))
-    override
+  void weightsImproved() noexcept(
+    noexcept(rememberWeights()) and noexcept(alterWeights()) and noexcept(randomizeAlterings())) override
   {
     rememberWeights();
     myWeightsPreviouslyImproved = true;
@@ -248,9 +245,8 @@ public:
   }
 
   /// The latest weights did not improve, re-alter accordingly.
-  void weightsDidNotImprove()
-    noexcept(noexcept(bringBackBestWeights()) and noexcept(randomizeAlterings()) and noexcept(alterWeights()))
-    override
+  void weightsDidNotImprove() noexcept(
+    noexcept(bringBackBestWeights()) and noexcept(randomizeAlterings()) and noexcept(alterWeights())) override
   {
     bringBackBestWeights();
 
@@ -292,7 +288,7 @@ public:
   void logCurrentState(Logger& logger) const override
   {
     logger << "Maximum weight delta is " << myMaximumWeightDelta << '/' << MaximumWeightDelta
-            << ". Maximum interval is " << myMaximumWeightsInterval << '/' << myWeightsCount << ".\n";
+           << ". Maximum interval is " << myMaximumWeightsInterval << '/' << myWeightsCount << ".\n";
   }
 };
 
@@ -433,8 +429,5 @@ public:
     }
   }
 
-  Value uniqueSinkValue() const noexcept(noexcept(myValues.back())) override
-  {
-    return myValues.back();
-  }
+  Value uniqueSinkValue() const noexcept(noexcept(myValues.back())) override { return myValues.back(); }
 };

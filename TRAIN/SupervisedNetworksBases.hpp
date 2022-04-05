@@ -131,12 +131,11 @@ public:
     auto& [weightsFile, errorMessage, weightsFileSize]{ weightsFileStatus };
 
     // Validate that the weights file is the right size.
-    auto const requiredWeightsFileSize{ static_cast<decltype(weightsFileSize)>(myWeightsCount *
-                                                                               sizeof(myWeights[0])) };
+    auto const requiredWeightsFileSize{ static_cast<decltype(weightsFileSize)>(myWeightsCount * sizeof(myWeights[0])) };
     if (weightsFileSize != requiredWeightsFileSize) {
       logger.error();
       logger << "Weights file is of size " << weightsFileSize << " bytes but must be of size "
-             << requiredWeightsFileSize << " bytes for " << myWeightsCount<< " weights each of size "
+             << requiredWeightsFileSize << " bytes for " << myWeightsCount << " weights each of size "
              << sizeof(myWeights[0]) << " bytes.\n\n";
       return false;
     }
@@ -390,9 +389,13 @@ public:
   auto const& name() const noexcept { return myName; }
 
   decltype(auto) matrixDigraphsCount() const noexcept(noexcept(myMatrixDigraphPointers.size()))
-    { return myMatrixDigraphPointers.size(); }
+  {
+    return myMatrixDigraphPointers.size();
+  }
   decltype(auto) empty() const noexcept(noexcept(myMatrixDigraphPointers.empty()))
-    { return myMatrixDigraphPointers.empty(); }
+  {
+    return myMatrixDigraphPointers.empty();
+  }
 
   auto const& desiredMatrixName() const noexcept { return myDesiredMatrixName; }
 
@@ -562,16 +565,14 @@ public:
   /** @pre #canApplyWeights MUST ABSOLUTELY return TRUE before #applyWeights is called.
       For performance, not doing so may result in undefined behaviour.
   */
-  void applyWeights() const
-    noexcept(noexcept(myMatrixDigraphPointers[0]->applyWeights()))
+  void applyWeights() const noexcept(noexcept(myMatrixDigraphPointers[0]->applyWeights()))
   {
     for (auto&& matrixDigraphPointer : myMatrixDigraphPointers)
       matrixDigraphPointer->applyWeights();
   }
 
   /// @return 0 if there is no desired matrix digraph.
-  decltype(auto) desiredMatrixDigraphRank() const
-    noexcept(noexcept(myMatrixDigraphPointers[0]->uniqueSinkValue()))
+  decltype(auto) desiredMatrixDigraphRank() const noexcept(noexcept(myMatrixDigraphPointers[0]->uniqueSinkValue()))
   {
     Index rank{ 0 };
 
@@ -656,9 +657,7 @@ private:
     if (myGoferThreadsPoolPointer) {
       errands.reserve(mySupervisedNetworkEvents.size());
       for (auto&& supervisedNetworkEvent : mySupervisedNetworkEvents)
-        errands.emplace_back(
-          [&supervisedNetworkEvent]() { supervisedNetworkEvent.applyWeights(); }
-        );
+        errands.emplace_back([&supervisedNetworkEvent]() { supervisedNetworkEvent.applyWeights(); });
     }
 
     Index const ranksCount{ static_cast<Index>(mySupervisedNetworkEvents.size()) };
@@ -671,9 +670,8 @@ private:
     Timer timer;
     // Train up to maximum training cycles count or until the total ranks count reaches the event networks count.
     for (cyclesCount = 1, ++myMaximumTrainingCyclesCount;
-      myAlive and (cyclesCount != myMaximumTrainingCyclesCount) and (ranksTotal > ranksCount);
-      ++cyclesCount)
-    {
+         myAlive and (cyclesCount != myMaximumTrainingCyclesCount) and (ranksTotal > ranksCount);
+         ++cyclesCount) {
       if (myGoferThreadsPoolPointer) {
         // Calculate all event networks via the gofer threads pool.
         myGoferThreadsPoolPointer->enQueueErrands(errands);
@@ -683,7 +681,7 @@ private:
         for (auto&& supervisedNetworkEvent : mySupervisedNetworkEvents)
           supervisedNetworkEvent.applyWeights();
 
-      Index newRanksTotal {0};
+      Index newRanksTotal{ 0 };
       for (auto const& supervisedNetworkEvent : mySupervisedNetworkEvents)
         newRanksTotal += supervisedNetworkEvent.desiredMatrixDigraphRank();
 
@@ -702,12 +700,13 @@ private:
            so that elapsedTicks "becomes" elapsedSeconds.
         */
         auto const elapsedCycles_ticksPerSecond{ (cyclesCount - lastCyclesCount) * timer.TicksPerSecond };
-        auto const secondsLeft{ ((myMaximumTrainingCyclesCount - cyclesCount) * elapsedTicks)
-          / elapsedCycles_ticksPerSecond };
+        auto const secondsLeft{ ((myMaximumTrainingCyclesCount - cyclesCount) * elapsedTicks) /
+                                elapsedCycles_ticksPerSecond };
         auto const minutesLeft{ secondsLeft / 60 };
 
         logger << "  ∙ " << cyclesCount << " cycles spent ("
-               << static_cast<double>((cyclesCount * 100)) / static_cast<double>(myMaximumTrainingCyclesCount) << "%), ";
+               << static_cast<double>((cyclesCount * 100)) / static_cast<double>(myMaximumTrainingCyclesCount)
+               << "%), ";
         if (minutesLeft > 0)
           logger << (minutesLeft / 60) << " hr " << (minutesLeft % 60) << " min";
         else
@@ -719,8 +718,7 @@ private:
           logRanks(logger);
         }
 
-        summaryCyclesCount = cyclesCount
-          + ((elapsedCycles_ticksPerSecond * SummarySecondsCount) / elapsedTicks);
+        summaryCyclesCount = cyclesCount + ((elapsedCycles_ticksPerSecond * SummarySecondsCount) / elapsedTicks);
         lastCyclesCount = cyclesCount;
 
         // Restart the timer.
@@ -804,8 +802,8 @@ public:
         throw false;
     } catch (...) {
       logger.error() << "Maximum number of training cycles must be between 1 and "
-                     << std::numeric_limits<decltype(myMaximumTrainingCyclesCount)>::max() << ", not '"
-                     << arguments[1] << "'.\n\n";
+                     << std::numeric_limits<decltype(myMaximumTrainingCyclesCount)>::max() << ", not '" << arguments[1]
+                     << "'.\n\n";
       logUsage();
 
       return false;
@@ -816,16 +814,15 @@ public:
     decltype(std::stoi(arguments[2])) trainingThreadsCount;
     try {
       trainingThreadsCount = std::stoi(arguments[2]);
-      if ((trainingThreadsCount) and
-        ((trainingThreadsCount <
-          static_cast<decltype(trainingThreadsCount)>(GoferThreadsPool::MinimumGoferThreadsCount))
-        or (trainingThreadsCount >
-          static_cast<decltype(trainingThreadsCount)>(GoferThreadsPool::MaximumGoferThreadsCount))))
+      if ((trainingThreadsCount) and ((trainingThreadsCount < static_cast<decltype(trainingThreadsCount)>(
+                                                                GoferThreadsPool::MinimumGoferThreadsCount)) or
+                                      (trainingThreadsCount > static_cast<decltype(trainingThreadsCount)>(
+                                                                GoferThreadsPool::MaximumGoferThreadsCount))))
         throw false;
     } catch (...) {
       logger.error() << "Number of training threads must be 0 or be between "
-                     << GoferThreadsPool::MinimumGoferThreadsCount
-                     << " and " << GoferThreadsPool::MaximumGoferThreadsCount << ", not '" << arguments[2] << "'.\n\n";
+                     << GoferThreadsPool::MinimumGoferThreadsCount << " and "
+                     << GoferThreadsPool::MaximumGoferThreadsCount << ", not '" << arguments[2] << "'.\n\n";
       logUsage();
 
       return false;
@@ -895,9 +892,9 @@ public:
     else
       logger << "\n● Creating the randomized weights crafter...\n";
 
-    if (not (myWeightsCrafterPointer = weightsCrafterInstantiator(commonRequiredWeightsCount)))
-      throw std::logic_error(String(+"weightsCrafterInstantiator failed to create a weights crafter in: ",
-                                    +__PRETTY_FUNCTION__, '.'));
+    if (not(myWeightsCrafterPointer = weightsCrafterInstantiator(commonRequiredWeightsCount)))
+      throw std::logic_error(
+        String(+"weightsCrafterInstantiator failed to create a weights crafter in: ", +__PRETTY_FUNCTION__, '.'));
 
     // Populate the weights crafter if a file name was provided.
     if (weightsFileName) {
@@ -920,8 +917,7 @@ public:
       supervisedNetworkEvent.useWeightsCrafter(myWeightsCrafterPointer);
 
     // Create, or not, the gofer threads.
-    if (myMaximumTrainingCyclesCount > 1)
-    {
+    if (myMaximumTrainingCyclesCount > 1) {
       if (trainingThreadsCount == 1)
         logger << "\n● The training will be done on the main thread.\n";
       else {
