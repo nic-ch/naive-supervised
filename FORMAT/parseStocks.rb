@@ -693,7 +693,7 @@ class StocksParser
     maximumPriceRangeFraction = Rational(@maximumPriceRangeFraction)
     print("\n∙∙∙  Calculated maximum price range fraction is ", Float(calculatedMaximumPriceRangeFraction).round(6))
     if calculatedMaximumPriceRangeFraction > maximumPriceRangeFraction
-      print(" AND WILL BE USED.\n.")
+      print(" AND WILL BE USED.\n")
     else
       calculatedMaximumPriceRangeFraction = maximumPriceRangeFraction
       print(' but ', @maximumPriceRangeFraction, " will be used.\n")
