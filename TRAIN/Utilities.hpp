@@ -587,20 +587,23 @@ private:
   */
   void goferThreadMethod()
   {
-    std::decay_t<decltype(myErrandsQueue.front())> errand;
-    bool firstTime{ true };
+    // Lock guard context.
+    {
+      std::lock_guard const lockGuard(myMutex);
+
+      // Simulate that an errand was just run.
+      ++myErrandsLeftCount;
+    }
+
     // Loop forever, or return if myMustDie.
     // ## Run-errands loop ##
-    for (;;) {
+    for (std::decay_t<decltype(myErrandsQueue.front())> errand; ; ) {
       // ## Lock guard context ##
       {
         std::lock_guard const lockGuard(myMutex);
 
-        if (firstTime)
-          firstTime = false;
-        else
-          // One errand was just ran by me below.
-          --myErrandsLeftCount;
+        // One errand was just ran by me below.
+        --myErrandsLeftCount;
 
         // Loop forever, or return if myMustDie, run an errand.
         // ## Look-for-an-errand-to-run loop ##
