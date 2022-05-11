@@ -1,4 +1,4 @@
-[Back](../README.md)
+[← Back](../README.md)
 
 # Normalize and Format the Training Data
 
