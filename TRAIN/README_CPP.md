@@ -16,7 +16,7 @@ According to Bjarne Stroustrup:
 
 *All trademarks are the property of their respective owners.*
 
-Copyright 2022 Nicolas Chaussé (nicolaschausse@protonmail.com)
+Copyright 2022 Nicolas Chaussé (nicolaschausse@proton.me)
 
     This project is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

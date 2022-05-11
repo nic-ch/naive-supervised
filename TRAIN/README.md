@@ -8,7 +8,7 @@ Please see the [C++ README](README_CPP.md) for everything specifically related t
 
 *All trademarks are the property of their respective owners.*
 
-Copyright 2022 Nicolas Chaussé (nicolaschausse@protonmail.com)
+Copyright 2022 Nicolas Chaussé (nicolaschausse@proton.me)
 
     This project is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ Copyright 2022 Nicolas Chaussé (nicolaschausse@protonmail.com)
 
 ## Introduction
 
-As stated in [Getting Started](GETTING_STARTED.md), we now want to develop a Supervised Learning train and predict program that shall be called as follows to train:
+As stated in [Getting Started](../GETTING_STARTED.md), we now want to develop a Supervised Learning train and predict program that shall be called as follows to train:
 
 ```
 $ train WEEK_1/EVENT_<date>.bin A
@@ -111,7 +111,7 @@ Usage: ./trainInputMatrices
 
 ### Strategy versus Template Method (NVI)
 
-In the class hierarchy above, the [Strategy pattern](https://en.wikipedia.org/wiki/Str    ategy_pattern) shall be utilized as opposed to the [Template Method pattern](https://en.wikipedi    a.org/wiki/Template_method_pattern) or [Non-Virtual Interface pattern (NVI)](https://en.wikipedi    a.org/wiki/Non-virtual_interface_pattern), as one can assume that there shall be little invarian    t commonalities between a single layer networks and deeper learning networks.
+In the class hierarchy above, the [Strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern) shall be utilized as opposed to the [Template Method pattern](https://en.wikipedia.org/wiki/Template_method_pattern) or [Non-Virtual Interface pattern (NVI)](https://en.wikipedia.org/wiki/Non-virtual_interface_pattern), as one can assume that there shall be little invariant commonalities between a single layer networks and deeper learning networks.
 
 ## Supervised Networks Bases
 
